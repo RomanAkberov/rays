@@ -1,3 +1,4 @@
+use std::ops::Mul;
 use serde::Deserialize;
 
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
@@ -31,4 +32,16 @@ impl From<[f64; 3]> for Color {
             b: array[2],
         }
     }
+}
+
+impl Mul<f64> for Color {
+    type Output = Self;
+    
+    fn mul(self, other: f64) -> Self::Output {
+        Self {
+            r: self.r * other,
+            g: self.g * other,
+            b: self.b * other,
+        }
+    }   
 }

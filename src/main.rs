@@ -16,8 +16,8 @@ use scene::Scene;
 pub type RayResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 fn trace(ray: &Ray, scene: &Scene) -> Color {
-    if let Some(_) = scene.sphere.hit(&ray) {
-        return Color::new(1.0, 0.0, 0.0);
+    if let Some(hit) = scene.sphere.hit(&ray) {
+        return Color::new(hit.normal.x + 1.0, hit.normal.y + 1.0, hit.normal.z + 1.0) * 0.5;
     }
     let unit_direction = ray.direction.normalized();
     let t = 0.5 * (unit_direction.y + 1.0);
@@ -28,7 +28,7 @@ fn render(scene: &Scene, image: &mut Image) {
     for i in 0 .. image.width {
         for j in 0 .. image.height {
             let u = i as f64 / (image.width - 1) as f64;
-            let v = j as f64 / (image.height - 1) as f64;
+            let v = 1.0 - j as f64 / (image.height - 1) as f64;
             let ray = scene.camera.ray(u, v);
             let color = trace(&ray, scene);
             image.set_color(i, j, color);
