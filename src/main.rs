@@ -2,6 +2,7 @@ mod color;
 mod image;
 mod math;
 mod scene;
+mod shapes;
 
 use std::{
     fs::File,
@@ -14,7 +15,10 @@ use scene::Scene;
 
 pub type RayResult<T> = Result<T, Box<dyn std::error::Error>>;
 
-fn trace(ray: Ray, scene: &Scene) -> Color {
+fn trace(ray: &Ray, scene: &Scene) -> Color {
+    if let Some(_) = scene.sphere.hit(&ray) {
+        return Color::new(1.0, 0.0, 0.0);
+    }
     let unit_direction = ray.direction.normalized();
     let t = 0.5 * (unit_direction.y + 1.0);
     scene.background.bottom.lerp(&scene.background.top, t)
@@ -26,7 +30,7 @@ fn render(scene: &Scene, image: &mut Image) {
             let u = i as f64 / (image.width - 1) as f64;
             let v = j as f64 / (image.height - 1) as f64;
             let ray = scene.camera.ray(u, v);
-            let color = trace(ray, scene);
+            let color = trace(&ray, scene);
             image.set_color(i, j, color);
         }
     }

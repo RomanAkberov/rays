@@ -2,12 +2,14 @@ use serde::Deserialize;
 use crate::{
     color::Color,
     math::{Vector3, Ray},
+    shapes::Sphere,
 };
 
 #[derive(Deserialize)]
 pub struct Scene {
     pub camera: Camera,
     pub background: Background,
+    pub sphere: Sphere,
 }
 
 #[derive(Deserialize)]
