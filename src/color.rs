@@ -1,4 +1,4 @@
-use std::ops::Mul;
+use std::ops::{Add, Mul};
 use serde::Deserialize;
 
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
@@ -30,6 +30,18 @@ impl From<[f64; 3]> for Color {
             r: array[0],
             g: array[1],
             b: array[2],
+        }
+    }
+}
+
+impl Add for Color {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self::Output {
+        Self {
+            r: self.r + other.r,
+            g: self.g + other.g,
+            b: self.b + other.b,
         }
     }
 }
