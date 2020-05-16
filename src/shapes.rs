@@ -18,13 +18,21 @@ impl Sphere {
         let a = ray.direction.dot(&ray.direction);
         let b = ray.direction.dot(&oc);
         let c = oc.dot(&oc) - self.radius * self.radius;
-        let discriminant = b * b - a * c;
-        if discriminant < 0.0 {
+        let d = b * b - a * c;
+        if d < 0.0 {
             None
         } else {
-            let t = (-b - discriminant.sqrt()) / a;
-            let normal = (ray.at(t) - self.center).normalized();
-            Some(Hit { t, normal })
+            let d_sqrt = d.sqrt(); 
+            let mut t = (-b - d_sqrt) / a;
+            if t <= 0.0 {
+                t = (-b + d_sqrt) / a;
+            }
+            if t <= 0.0 {
+                None
+            } else {
+                let normal = (ray.at(t) - self.center).normalized();
+                Some(Hit { t, normal })
+            }
         }
     }
 }

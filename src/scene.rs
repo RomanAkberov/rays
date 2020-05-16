@@ -9,7 +9,7 @@ use crate::{
 pub struct Scene {
     pub camera: Camera,
     pub background: Background,
-    pub sphere: Sphere,
+    pub shapes: Vec<Sphere>,
 }
 
 #[derive(Deserialize)]

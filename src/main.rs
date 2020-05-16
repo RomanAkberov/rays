@@ -16,7 +16,11 @@ use scene::Scene;
 pub type RayResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 fn trace(ray: &Ray, scene: &Scene) -> Color {
-    if let Some(hit) = scene.sphere.hit(&ray) {
+    let hit = scene.shapes
+        .iter()
+        .flat_map(|shape| shape.hit(&ray))
+        .min_by(|hit1, hit2| hit1.t.partial_cmp(&hit2.t).unwrap());
+    if let Some(hit) = hit {
         return Color::new(hit.normal.x + 1.0, hit.normal.y + 1.0, hit.normal.z + 1.0) * 0.5;
     }
     let unit_direction = ray.direction.normalized();
