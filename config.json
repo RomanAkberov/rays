@@ -1,5 +1,7 @@
 {
     "width": 800,
     "height": 450,
-    "samples": 100
+    "samples": 100,
+    "max_depth": 50,
+    "gamma_correction": true
 }

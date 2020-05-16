@@ -21,13 +21,19 @@ use scene::Scene;
 
 pub type RayResult<T> = Result<T, Box<dyn std::error::Error>>;
 
-fn trace(ray: &Ray, scene: &Scene) -> Color {
+fn cast_ray(ray: &Ray, scene: &Scene, random: &mut Random, depth: u32) -> Color {
+    if depth == 0 {
+        return Color::new(0.0, 0.0, 0.0);
+    }
     let hit = scene.shapes
         .iter()
         .flat_map(|shape| shape.hit(&ray))
         .min_by(|hit1, hit2| hit1.t.partial_cmp(&hit2.t).unwrap());
     if let Some(hit) = hit {
-        return Color::new(hit.normal.x + 1.0, hit.normal.y + 1.0, hit.normal.z + 1.0) * 0.5;
+        let origin = ray.at(hit.t);
+        let direction = hit.normal + random.in_unit_sphere();
+        let ray = Ray { origin, direction };
+        return cast_ray(&ray, scene, random, depth - 1) * 0.5;
     }
     let unit_direction = ray.direction.normalized();
     let t = 0.5 * (unit_direction.y + 1.0);
@@ -36,19 +42,25 @@ fn trace(ray: &Ray, scene: &Scene) -> Color {
 
 fn render(scene: &Scene, config: &Config) -> Image {
     let start = Instant::now();
-    let mut image = Image::new(config.width, config.height);
-    let mut random = Random::new(42);
     let scale = 1.0 / config.samples as f64;
-    for i in 0 .. image.width {
-        for j in 0 .. image.height {
+    let mut random = Random::from_seed(42);
+    let mut colors = Vec::with_capacity((config.width * config.height) as usize);
+    for j in 0 .. config.height {
+        for i in 0 .. config.width {
             let mut color = Color::new(0.0, 0.0, 0.0);
             for _ in 0 .. config.samples {
-                let u = (i as f64 + random.next_f64()) / (image.width - 1) as f64;
-                let v = 1.0 - (j as f64 + random.next_f64()) / (image.height - 1) as f64;
+                let u = (i as f64 + random.range01()) / (config.width - 1) as f64;
+                let v = 1.0 - (j as f64 + random.range01()) / (config.height - 1) as f64;
                 let ray = scene.camera.ray(u, v);
-                color = color + trace(&ray, scene);
+                color = color + cast_ray(&ray, scene, &mut random, config.max_depth);
             }
-            image.set_color(i, j, color * scale);
+            color = color * scale;
+            if config.gamma_correction {
+                color.r = color.r.sqrt();
+                color.g = color.g.sqrt();
+                color.b = color.b.sqrt();
+            }
+            colors.push(color);
         }
     }
     let end = Instant::now();
@@ -57,7 +69,11 @@ fn render(scene: &Scene, config: &Config) -> Image {
     let per_ray = total / num_rays;
     println!("{}.{:09}s total", total.as_secs(), total.subsec_nanos());
     println!("{}.{:09}s per ray", per_ray.as_secs(), per_ray.subsec_nanos());
-    image
+    Image {
+        width: config.width,
+        height: config.height,
+        colors,
+    }
 }
 
 fn save_png(image: &Image, path: &str) -> RayResult<()> {

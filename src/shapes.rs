@@ -1,6 +1,8 @@
 use serde::Deserialize;
 use crate::math::{Vector3, Ray};
 
+const T_MIN: f64 = 0.001;
+
 pub struct Hit {
     pub t: f64,
     pub normal: Vector3,
@@ -24,10 +26,10 @@ impl Sphere {
         } else {
             let d_sqrt = d.sqrt(); 
             let mut t = (-b - d_sqrt) / a;
-            if t <= 0.0 {
+            if t <= T_MIN {
                 t = (-b + d_sqrt) / a;
             }
-            if t <= 0.0 {
+            if t <= T_MIN {
                 None
             } else {
                 let normal = (ray.at(t) - self.center).normalized();
