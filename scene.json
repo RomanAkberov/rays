@@ -8,14 +8,24 @@
         "top": [0.5, 0.7, 1.0],
         "bottom": [1.0, 1.0, 1.0]
     },
-    "shapes": [
+    "objects": [
         {
-            "center": [0.0, 0.0, -1.0],
-            "radius": 0.5
+            "material": {
+                "albedo": [1.0, 0.0, 0.0]
+            },
+            "shape": {
+                "center": [0.0, 0.0, -1.0],
+                "radius": 0.5
+            }
         },
         {
-            "center": [0, -100.5, -1],
-            "radius": 100.0
+            "material": {
+                "albedo": [0.0, 1.0, 0.0]
+            },
+            "shape": {
+                "center": [0, -100.5, -1],
+                "radius": 100.0
+            }
         }
     ]
 }

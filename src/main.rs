@@ -1,6 +1,7 @@
 mod color;
 mod config;
 mod image;
+mod material;
 mod math;
 mod random;
 mod scene;
@@ -23,17 +24,18 @@ pub type RayResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 fn cast_ray(ray: &Ray, scene: &Scene, random: &mut Random, depth: u32) -> Color {
     if depth == 0 {
-        return Color::new(0.0, 0.0, 0.0);
+        return Color::BLACK;
     }
-    let hit = scene.shapes
+    let hit = scene.objects
         .iter()
-        .flat_map(|shape| shape.hit(&ray))
-        .min_by(|hit1, hit2| hit1.t.partial_cmp(&hit2.t).unwrap());
-    if let Some(hit) = hit {
-        let origin = ray.at(hit.t);
-        let direction = hit.normal + random.in_unit_sphere();
-        let ray = Ray { origin, direction };
-        return cast_ray(&ray, scene, random, depth - 1) * 0.5;
+        .flat_map(|object| object.shape.hit(&ray).map(|hit| (hit, &object.material)))
+        .min_by(|hit1, hit2| hit1.0.t.partial_cmp(&hit2.0.t).unwrap());
+    if let Some((hit, material)) = hit {
+        if let Some((color, ray)) = material.scatter(ray, &hit, random) {
+            return color * cast_ray(&ray, scene, random, depth - 1);
+        } else {
+            return Color::BLACK;
+        }
     }
     let unit_direction = ray.direction.normalized();
     let t = 0.5 * (unit_direction.y + 1.0);
@@ -47,7 +49,7 @@ fn render(scene: &Scene, config: &Config) -> Image {
     let mut colors = Vec::with_capacity((config.width * config.height) as usize);
     for j in 0 .. config.height {
         for i in 0 .. config.width {
-            let mut color = Color::new(0.0, 0.0, 0.0);
+            let mut color = Color::BLACK;
             for _ in 0 .. config.samples {
                 let u = (i as f64 + random.range01()) / (config.width - 1) as f64;
                 let v = 1.0 - (j as f64 + random.range01()) / (config.height - 1) as f64;

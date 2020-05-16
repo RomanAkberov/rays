@@ -25,7 +25,7 @@ impl Random {
         self.state as f64 / 4294967296.0
     }
 
-    pub fn in_unit_sphere(&mut self) -> Vector3 {
+    pub fn in_sphere(&mut self) -> Vector3 {
         loop {
             let v = Vector3::new(
                 self.range01() * 2.0 - 1.0, 
@@ -35,6 +35,15 @@ impl Random {
             if v.length_squared() < 1.0 {
                 return v;
             }
+        }
+    }
+
+    pub fn in_hemisphere(&mut self, normal: &Vector3) -> Vector3 {
+        let in_sphere = self.in_sphere();
+        if in_sphere.dot(normal) > 0.0 {
+            in_sphere
+        } else {
+            -in_sphere
         }
     }
 }

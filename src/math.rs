@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Mul};
+use std::ops::{Add, Sub, Mul, Neg};
 use serde::Deserialize;
 
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
@@ -64,6 +64,14 @@ impl Mul<f64> for Vector3 {
 
     fn mul(self, other: f64) -> Self::Output {
         Self::new(self.x * other, self.y * other, self.z * other)
+    }
+}
+
+impl Neg for Vector3 {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self::new(-self.x, -self.y, -self.z)
     }
 }
 

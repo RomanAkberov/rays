@@ -1,6 +1,7 @@
 use serde::Deserialize;
 use crate::{
     color::Color,
+    material::Material,
     math::{Vector3, Ray},
     shapes::Sphere,
 };
@@ -9,7 +10,13 @@ use crate::{
 pub struct Scene {
     pub camera: Camera,
     pub background: Background,
-    pub shapes: Vec<Sphere>,
+    pub objects: Vec<SceneObject>,
+}
+
+#[derive(Deserialize)]
+pub struct SceneObject {
+    pub shape: Sphere,
+    pub material: Material,
 }
 
 #[derive(Deserialize)]

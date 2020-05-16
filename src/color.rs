@@ -1,8 +1,9 @@
 use std::ops::{Add, Mul};
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
+#[serde(into = "[f64; 3]")]
 #[serde(from = "[f64; 3]")]
 pub struct Color {
     pub r: f64,
@@ -11,6 +12,8 @@ pub struct Color {
 }
 
 impl Color {
+    pub const BLACK: Self = Self::new(0.0, 0.0, 0.0);
+    
     pub const fn new(r: f64, g: f64, b: f64) -> Self {
         Self { r, g, b }
     }
@@ -21,6 +24,12 @@ impl Color {
             g: self.g + (other.g - self.g) * t,
             b: self.b + (other.b - self.b) * t,
         }
+    }
+}
+
+impl Into<[f64; 3]> for Color {
+    fn into(self) -> [f64; 3] {
+        [self.r, self.g, self.b]
     }
 }
 
@@ -54,6 +63,18 @@ impl Mul<f64> for Color {
             r: self.r * other,
             g: self.g * other,
             b: self.b * other,
+        }
+    }   
+}
+
+impl Mul for Color {
+    type Output = Self;
+    
+    fn mul(self, other: Color) -> Self::Output {
+        Self {
+            r: self.r * other.r,
+            g: self.g * other.g,
+            b: self.b * other.b,
         }
     }   
 }
