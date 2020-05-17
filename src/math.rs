@@ -84,6 +84,8 @@ impl<F> Vector3<F> {
 }
 
 impl<F: Float> Vector3<F> {
+    pub const ZERO: Self = Self::new(F::ZERO, F::ZERO, F::ZERO);
+    
     pub fn normalized(self) -> Self {
         let scale = F::ONE / self.length();
         Self::new(self.x * scale, self.y * scale, self.z * scale)

@@ -1,8 +1,12 @@
+mod background;
+mod camera;
 mod color;
 mod config;
+mod def;
 mod image;
 mod material;
 mod math;
+mod object;
 mod random;
 mod ray_marcher;
 mod ray_tracer;
@@ -17,6 +21,7 @@ use std::{
     time::Instant,
 };
 use config::Config;
+use def::SceneDef;
 use image::Image;
 use math::Float;
 use ray_marcher::RayMarcher;
@@ -60,7 +65,9 @@ fn render<F: Float, P: PixelRenderer>(pixel_renderer: P, scene: &Scene<F>, confi
 }
 
 fn run<F: Float>(config: &Config) -> RayResult<()> {
-    let scene = load_json::<Scene<F>>("scene.json")?;
+    let def = load_json::<SceneDef<F>>("scene.json")?;
+    let aspect = F::of(config.image.width as f64 / config.image.height as f64);
+    let scene = Scene::load(def, aspect);
     render(RayTracer::new(config.max_depth), &scene, &config, "ray-tracer.png")?;
     render(RayMarcher::new(), &scene, &config, "ray-marcher.png")?;
     Ok(())
