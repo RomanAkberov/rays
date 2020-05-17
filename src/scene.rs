@@ -2,7 +2,7 @@ use serde::Deserialize;
 use crate::{
     color::Color,
     material::Material,
-    math::{Vector3, Ray},
+    math::{Ray, Vector2, Vector3},
     shapes::Sphere,
 };
 
@@ -33,10 +33,10 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn ray(&self, u: f64, v: f64) -> Ray {
+    pub fn ray(&self, uv: Vector2) -> Ray {
         Ray {
             origin: self.eye,
-            direction: (self.right * (u - 0.5) + self.up * (v - 0.5) - Vector3::new(0.0, 0.0, 1.0)).normalized(),
+            direction: (self.right * (uv.x - 0.5) + self.up * (uv.y - 0.5) - Vector3::new(0.0, 0.0, 1.0)).normalized(),
         }
     } 
 }

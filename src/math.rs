@@ -2,6 +2,18 @@ use std::ops::{Add, Sub, Mul, Neg};
 use serde::Deserialize;
 
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
+pub struct Vector2 {
+    pub x: f64,
+    pub y: f64,
+}
+
+impl Vector2 {
+    pub const fn new(x: f64, y: f64) -> Self {
+        Self { x, y, }
+    }
+}
+
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 #[derive(Deserialize)]
 #[serde(from = "[f64; 3]")]
 pub struct Vector3 {

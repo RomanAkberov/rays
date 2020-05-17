@@ -16,11 +16,11 @@ use std::{
     io::BufWriter,
     time::Instant,
 };
-use config::{Config, ImageConfig};
+use config::Config;
 use image::Image;
 use ray_marcher::RayMarcher;
 use ray_tracer::RayTracer;
-use renderer::{Renderer, PixelRenderer};
+use renderer::{Renderer, PixelRenderer, Supersampler};
 use scene::Scene;
 
 pub type RayResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -48,10 +48,10 @@ fn load_json<T: for <'d> Deserialize<'d>>(path: &str) -> RayResult<T> {
     Ok(value)
 }
 
-fn render<P: PixelRenderer>(pixel_renderer: P, scene: &Scene, config: &ImageConfig, path: &str) -> RayResult<()> {
-    let mut renderer = Renderer::new(pixel_renderer);
+fn render<P: PixelRenderer>(pixel_renderer: P, scene: &Scene, config: &Config, path: &str) -> RayResult<()> {
+    let mut renderer = Renderer::new(Supersampler::new(pixel_renderer, config.samples));
     let start = Instant::now();
-    let image = renderer.render(&scene, &config);
+    let image = renderer.render(&scene, &config.image);
     let end = Instant::now();
     let duration = end - start;
     println!("{}.{:09}s total", duration.as_secs(), duration.subsec_nanos());
@@ -61,7 +61,7 @@ fn render<P: PixelRenderer>(pixel_renderer: P, scene: &Scene, config: &ImageConf
 fn main() -> RayResult<()> {
     let scene = load_json::<Scene>("scene.json")?;
     let config = load_json::<Config>("config.json")?;
-    render(RayTracer::new(config.ray_tracer), &scene, &config.image, "ray-tracer.png")?;
-    render(RayMarcher::new(), &scene, &config.image, "ray-marcher.png")?;
+    render(RayTracer::new(config.max_depth), &scene, &config, "ray-tracer.png")?;
+    render(RayMarcher::new(), &scene, &config, "ray-marcher.png")?;
     Ok(())
 }

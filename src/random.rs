@@ -1,4 +1,5 @@
-use crate::math::Vector3;
+use crate::math::{Vector2, Vector3};
+use crate::renderer::Pixel;
 
 pub struct Random {
     state: u32,
@@ -44,6 +45,13 @@ impl Random {
             in_sphere
         } else {
             -in_sphere
+        }
+    }
+
+    pub fn in_pixel(&mut self, pixel: Pixel) -> Vector2 {
+        Vector2 {
+            x: (pixel.coord.x + self.range01()) / (pixel.frame_size.x - 1.0),
+            y: 1.0 - (pixel.coord.y + self.range01()) / (pixel.frame_size.y - 1.0),
         }
     }
 }

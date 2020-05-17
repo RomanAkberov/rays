@@ -1,12 +1,10 @@
 use serde::Deserialize;
-use crate::{
-    ray_tracer::RayTracerConfig,
-};
 
 #[derive(Deserialize)]
 pub struct Config {
     pub image: ImageConfig,
-    pub ray_tracer: RayTracerConfig,
+    pub samples: u32,
+    pub max_depth: u32,
 }
 
 #[derive(Deserialize)]

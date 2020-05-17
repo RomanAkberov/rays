@@ -4,8 +4,6 @@
         "height": 450,
         "gamma_correction": true
     },
-    "ray_tracer": {
-        "samples": 100,
-        "max_depth": 50
-    }
+    "samples": 100,
+    "max_depth": 50
 }

@@ -1,28 +1,20 @@
-use serde::Deserialize;
 use crate::{
     color::Color,
     math::Ray,
     random::Random,
-    renderer::PixelRenderer,
+    renderer::{PixelRenderer, Pixel},
     scene::Scene,
 };
 
-#[derive(Deserialize)]
-pub struct RayTracerConfig {
-    pub samples: u32,
-    pub max_depth: u32,
-}
-
-
 pub struct RayTracer {
-    config: RayTracerConfig,
+    max_depth: u32,
     random: Random,
 }
 
 impl RayTracer {
-    pub fn new(config: RayTracerConfig) -> Self {
+    pub fn new(max_depth: u32) -> Self {
         Self {
-            config,
+            max_depth,
             random: Random::from_seed(42),
         }
     }
@@ -49,15 +41,8 @@ impl RayTracer {
 }
 
 impl PixelRenderer for RayTracer {
-    fn render_pixel(&mut self, scene: &Scene, pixel: (u32, u32), size: (u32, u32)) -> Color {
-        let scale = 1.0 / self.config.samples as f64;
-        let mut color = Color::BLACK;
-        for _ in 0 .. self.config.samples {
-            let u = (pixel.0 as f64 + self.random.range01()) / (size.0 - 1) as f64;
-            let v = 1.0 - (pixel.1 as f64 + self.random.range01()) / (size.1 - 1) as f64;
-            let ray = scene.camera.ray(u, v);
-            color = color + self.cast_ray(&ray, scene, self.config.max_depth);
-        }
-        color * scale
+    fn render_pixel(&mut self, scene: &Scene, pixel: Pixel) -> Color {
+        let ray = scene.camera.ray(self.random.in_pixel(pixel));
+        self.cast_ray(&ray, scene, self.max_depth)
     }
 }

@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul};
+use std::ops::{Add, AddAssign, Mul};
 use serde::{Serialize, Deserialize};
 
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
@@ -52,6 +52,14 @@ impl Add for Color {
             g: self.g + other.g,
             b: self.b + other.b,
         }
+    }
+}
+
+impl AddAssign for Color {
+    fn add_assign(&mut self, other: Self) {
+        self.r += other.r;
+        self.g += other.g;
+        self.b += other.b;
     }
 }
 
