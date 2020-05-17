@@ -34,9 +34,7 @@ impl RayTracer {
                 return Color::BLACK;
             }
         }
-        let unit_direction = ray.direction;
-        let t = 0.5 * (unit_direction.y + 1.0);
-        scene.background.bottom.lerp(&scene.background.top, t)
+        scene.background.color(ray)
     }
 }
 

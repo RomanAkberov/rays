@@ -31,14 +31,14 @@ impl PixelRenderer for RayMarcher {
                 .min_by(|hit1, hit2| hit1.1.partial_cmp(&hit2.1).unwrap());
             if let Some((obj, t)) = hit {
                 if t >= MAX_T {
-                    return Color::BLACK;
+                    return scene.background.color(&ray);
                 }
                 if t <= MIN_T {
                     return obj.material.albedo;
                 }
                 ray.origin = ray.at(t);
             } else {
-                return Color::BLACK;
+                return scene.background.color(&ray);
             }
         }
     }
