@@ -36,7 +36,7 @@ impl Material {
                 }
             }
         };
-        let ray = Ray { origin, direction };
+        let ray = Ray { origin, direction: direction.normalized() };
         Some((self.albedo, ray))
     }
 }

@@ -3,8 +3,9 @@ mod config;
 mod image;
 mod material;
 mod math;
-mod path_tracer;
 mod random;
+mod ray_marcher;
+mod ray_tracer;
 mod renderer;
 mod scene;
 mod shapes;
@@ -15,10 +16,11 @@ use std::{
     io::BufWriter,
     time::Instant,
 };
-use config::Config;
+use config::{Config, ImageConfig};
 use image::Image;
-use path_tracer::PathTracer;
-use renderer::Renderer;
+use ray_marcher::RayMarcher;
+use ray_tracer::RayTracer;
+use renderer::{Renderer, PixelRenderer};
 use scene::Scene;
 
 pub type RayResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -46,14 +48,20 @@ fn load_json<T: for <'d> Deserialize<'d>>(path: &str) -> RayResult<T> {
     Ok(value)
 }
 
-fn main() -> RayResult<()> {
-    let scene = load_json::<Scene>("scene.json")?;
-    let config = load_json::<Config>("config.json")?;
-    let mut renderer = PathTracer::new(config);
+fn render<P: PixelRenderer>(pixel_renderer: P, scene: &Scene, config: &ImageConfig, path: &str) -> RayResult<()> {
+    let mut renderer = Renderer::new(pixel_renderer);
     let start = Instant::now();
-    let image = renderer.render(&scene);
+    let image = renderer.render(&scene, &config);
     let end = Instant::now();
     let duration = end - start;
     println!("{}.{:09}s total", duration.as_secs(), duration.subsec_nanos());
-    save_png(&image, "output.png")
+    save_png(&image, path)
+}
+
+fn main() -> RayResult<()> {
+    let scene = load_json::<Scene>("scene.json")?;
+    let config = load_json::<Config>("config.json")?;
+    render(RayTracer::new(config.ray_tracer), &scene, &config.image, "ray-tracer.png")?;
+    render(RayMarcher::new(), &scene, &config.image, "ray-marcher.png")?;
+    Ok(())
 }
