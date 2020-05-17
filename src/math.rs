@@ -1,56 +1,113 @@
-use std::ops::{Add, Sub, Mul, Neg};
-use serde::Deserialize;
+use std::ops;
+use serde::{Serialize, Deserialize};
 
-#[derive(Copy, Clone, Debug, Default, PartialEq)]
-pub struct Vector2 {
-    pub x: f64,
-    pub y: f64,
+pub trait Float : Copy + Clone + Default + 
+    PartialEq + PartialOrd +
+    Sync + Send +
+    Serialize + for<'d> Deserialize<'d> +
+    ops::Add<Output=Self> + ops::AddAssign +
+    ops::Sub<Output=Self> + ops::SubAssign + 
+    ops::Mul<Output=Self> + ops::MulAssign + 
+    ops::Div<Output=Self> + ops::DivAssign +
+    ops::Neg<Output=Self> {
+    const ZERO: Self;
+    const ONE: Self;
+    const TWO: Self;
+    const HALF: Self;
+    fn of(value: f64) -> Self;
+    fn to(self) -> f64;
+    fn sqrt(self) -> Self;
 }
 
-impl Vector2 {
-    pub const fn new(x: f64, y: f64) -> Self {
+impl Float for f64 {
+    const ZERO: Self = 0.0;
+    const ONE: Self = 1.0;
+    const TWO: Self = 2.0;
+    const HALF: Self = 0.5;
+
+    fn of(value: f64) -> Self {
+        value
+    }
+
+    fn to(self) -> f64 {
+        self
+    }
+
+    fn sqrt(self) -> Self {
+        f64::sqrt(self)
+    }
+}
+
+impl Float for f32 {
+    const ZERO: Self = 0.0;
+    const ONE: Self = 1.0;
+    const TWO: Self = 2.0;
+    const HALF: Self = 0.5;
+
+    fn of(value: f64) -> Self {
+        value as f32
+    }
+
+    fn to(self) -> f64 {
+        self as f64
+    }
+
+    fn sqrt(self) -> Self {
+        f32::sqrt(self)
+    }
+}
+
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
+pub struct Vector2<F> {
+    pub x: F,
+    pub y: F,
+}
+
+impl<F> Vector2<F> {
+    pub const fn new(x: F, y: F) -> Self {
         Self { x, y, }
     }
 }
 
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 #[derive(Deserialize)]
-#[serde(from = "[f64; 3]")]
-pub struct Vector3 {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
+pub struct Vector3<F> {
+    pub x: F,
+    pub y: F,
+    pub z: F,
 }
 
-impl Vector3 {
-    pub const fn new(x: f64, y: f64, z: f64) -> Self {
+impl<F> Vector3<F> {
+    pub const fn new(x: F, y: F, z: F) -> Self {
         Self { x, y, z }
     }
+}
 
+impl<F: Float> Vector3<F> {
     pub fn normalized(self) -> Self {
-        let scale = 1.0 / self.length();
+        let scale = F::ONE / self.length();
         Self::new(self.x * scale, self.y * scale, self.z * scale)
     }
 
-    pub fn length(self) -> f64 {
+    pub fn length(self) -> F {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
-    pub fn length_squared(self) -> f64 {
+    pub fn length_squared(self) -> F {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    pub fn distance(self, other: Self) -> f64 {
+    pub fn distance(self, other: Self) -> F {
         (self - other).length()
     }
 
-    pub fn dot(self, other: Self) -> f64 {
+    pub fn dot(self, other: Self) -> F {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 }
 
-impl From<[f64; 3]> for Vector3 {
-    fn from(array: [f64; 3]) -> Self {
+impl<F: Float> From<[F; 3]> for Vector3<F> {
+    fn from(array: [F; 3]) -> Self {
         Self {
             x: array[0],
             y: array[1],
@@ -59,7 +116,7 @@ impl From<[f64; 3]> for Vector3 {
     }
 }
 
-impl Add for Vector3 {
+impl<F: Float> ops::Add for Vector3<F> {
     type Output = Self;
 
     fn add(self, other: Self) -> Self::Output {
@@ -67,7 +124,7 @@ impl Add for Vector3 {
     }
 }
 
-impl Sub for Vector3 {
+impl<F: Float> ops::Sub for Vector3<F> {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self::Output {
@@ -75,15 +132,15 @@ impl Sub for Vector3 {
     }
 }
 
-impl Mul<f64> for Vector3 {
+impl<F: Float> ops::Mul<F> for Vector3<F> {
     type Output = Self;
 
-    fn mul(self, other: f64) -> Self::Output {
+    fn mul(self, other: F) -> Self::Output {
         Self::new(self.x * other, self.y * other, self.z * other)
     }
 }
 
-impl Neg for Vector3 {
+impl<F: Float> ops::Neg for Vector3<F> {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
@@ -92,13 +149,13 @@ impl Neg for Vector3 {
 }
 
 #[derive(Copy, Clone, Debug)]
-pub struct Ray {
-    pub origin: Vector3,
-    pub direction: Vector3,
+pub struct Ray<F: Float> {
+    pub origin: Vector3<F>,
+    pub direction: Vector3<F>,
 }
 
-impl Ray {
-    pub fn at(&self, t: f64) -> Vector3 {
+impl<F: Float> Ray<F> {
+    pub fn at(&self, t: F) -> Vector3<F> {
         self.origin + self.direction * t
     }
 }

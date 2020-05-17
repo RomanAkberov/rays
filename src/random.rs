@@ -1,4 +1,4 @@
-use crate::math::{Vector2, Vector3};
+use crate::math::{Float, Vector2, Vector3};
 use crate::renderer::Pixel;
 
 pub struct Random {
@@ -22,36 +22,36 @@ impl Random {
         self.state
     }
 
-    pub fn range01(&mut self) -> f64 {
-        self.next_state() as f64 / 4294967296.0
+    pub fn range01<F: Float>(&mut self) -> F {
+        F::of(self.next_state() as f64 / 4294967296.0)
     }
 
-    pub fn in_sphere(&mut self) -> Vector3 {
+    pub fn in_sphere<F: Float>(&mut self) -> Vector3<F> {
         loop {
             let v = Vector3::new(
-                self.range01() * 2.0 - 1.0, 
-                self.range01() * 2.0 - 1.0,
-                self.range01() * 2.0 - 1.0,
+                self.range01::<F>() * F::TWO - F::ONE, 
+                self.range01::<F>() * F::TWO - F::ONE,
+                self.range01::<F>() * F::TWO - F::ONE,
             );
-            if v.length_squared() < 1.0 {
+            if v.length_squared() < F::ONE {
                 return v;
             }
         }
     }
 
-    pub fn in_hemisphere(&mut self, normal: Vector3) -> Vector3 {
+    pub fn in_hemisphere<F: Float>(&mut self, normal: Vector3<F>) -> Vector3<F> {
         let in_sphere = self.in_sphere();
-        if in_sphere.dot(normal) > 0.0 {
+        if in_sphere.dot(normal) > F::ZERO {
             in_sphere
         } else {
             -in_sphere
         }
     }
 
-    pub fn in_pixel(&mut self, pixel: Pixel) -> Vector2 {
+    pub fn in_pixel<F: Float>(&mut self, pixel: Pixel<F>) -> Vector2<F> {
         Vector2 {
-            x: (pixel.coord.x + self.range01()) / (pixel.frame_size.x - 1.0),
-            y: 1.0 - (pixel.coord.y + self.range01()) / (pixel.frame_size.y - 1.0),
+            x: (pixel.coord.x + self.range01::<F>()) / (pixel.frame_size.x - F::ONE),
+            y: F::ONE - (pixel.coord.y + self.range01::<F>()) / (pixel.frame_size.y - F::ONE),
         }
     }
 }

@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use crate::{
     color::Color,
-    math::{Ray, Vector3},
+    math::{Float, Ray, Vector3},
     random::Random,
     shapes::Hit,
 };
@@ -13,15 +13,14 @@ pub enum Mode {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Material {
-    pub albedo: Color,
+pub struct Material<F> {
+    pub albedo: Color<F>,
     pub mode: Mode,
-    #[serde(default)]
-    pub fuzziness: f64,
+    pub fuzziness: F,
 }
 
-impl Material {
-    pub fn scatter(&self, ray: &Ray, hit: &Hit, random: &mut Random) -> Option<(Color, Ray)> {
+impl<F: Float> Material<F> {
+    pub fn scatter(&self, ray: &Ray<F>, hit: &Hit<F>, random: &mut Random) -> Option<(Color<F>, Ray<F>)> {
         let origin = ray.at(hit.t);
         let direction = match self.mode {
             Mode::Diffuse => {
@@ -29,7 +28,7 @@ impl Material {
             }
             Mode::Metallic => {
                 let reflected = reflect(ray.direction.normalized(), hit.normal);
-                if self.fuzziness > 0.0 {
+                if self.fuzziness > F::ZERO {
                     reflected + random.in_sphere() * self.fuzziness
                 } else {
                     reflected
@@ -41,6 +40,6 @@ impl Material {
     }
 }
 
-fn reflect(vector: Vector3, normal: Vector3) -> Vector3 {
-    vector - normal * 2.0 * vector.dot(normal)
+fn reflect<F: Float>(vector: Vector3<F>, normal: Vector3<F>) -> Vector3<F> {
+    vector - normal * F::TWO * vector.dot(normal)
 }

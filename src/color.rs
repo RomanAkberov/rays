@@ -1,24 +1,25 @@
 use std::ops::{Add, AddAssign, Mul};
 use serde::{Serialize, Deserialize};
+use crate::math::Float;
 
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 #[derive(Serialize, Deserialize)]
-#[serde(into = "[f64; 3]")]
-#[serde(from = "[f64; 3]")]
-pub struct Color {
-    pub r: f64,
-    pub g: f64,
-    pub b: f64,
+pub struct Color<F> {
+    pub r: F,
+    pub g: F,
+    pub b: F,
 }
 
-impl Color {
-    pub const BLACK: Self = Self::new(0.0, 0.0, 0.0);
-    
-    pub const fn new(r: f64, g: f64, b: f64) -> Self {
+impl<F> Color<F> {    
+    pub const fn new(r: F, g: F, b: F) -> Self {
         Self { r, g, b }
     }
+}
 
-    pub fn lerp(&self, other: &Self, t: f64) -> Self {
+impl<F: Float> Color<F> {
+    pub const BLACK: Self = Self::new(F::ZERO, F::ZERO, F::ZERO);
+    
+    pub fn lerp(&self, other: &Self, t: F) -> Self {
         Self {
             r: self.r + (other.r - self.r) * t,
             g: self.g + (other.g - self.g) * t,
@@ -27,14 +28,14 @@ impl Color {
     }
 }
 
-impl Into<[f64; 3]> for Color {
-    fn into(self) -> [f64; 3] {
+impl<F: Float> Into<[F; 3]> for Color<F> {
+    fn into(self) -> [F; 3] {
         [self.r, self.g, self.b]
     }
 }
 
-impl From<[f64; 3]> for Color {
-    fn from(array: [f64; 3]) -> Self {
+impl<F: Float> From<[F; 3]> for Color<F> {
+    fn from(array: [F; 3]) -> Self {
         Self {
             r: array[0],
             g: array[1],
@@ -43,7 +44,7 @@ impl From<[f64; 3]> for Color {
     }
 }
 
-impl Add for Color {
+impl<F: Float> Add for Color<F> {
     type Output = Self;
 
     fn add(self, other: Self) -> Self::Output {
@@ -55,7 +56,7 @@ impl Add for Color {
     }
 }
 
-impl AddAssign for Color {
+impl<F: Float> AddAssign for Color<F> {
     fn add_assign(&mut self, other: Self) {
         self.r += other.r;
         self.g += other.g;
@@ -63,10 +64,10 @@ impl AddAssign for Color {
     }
 }
 
-impl Mul<f64> for Color {
+impl<F: Float> Mul<F> for Color<F> {
     type Output = Self;
     
-    fn mul(self, other: f64) -> Self::Output {
+    fn mul(self, other: F) -> Self::Output {
         Self {
             r: self.r * other,
             g: self.g * other,
@@ -75,10 +76,10 @@ impl Mul<f64> for Color {
     }   
 }
 
-impl Mul for Color {
+impl<F: Float> Mul for Color<F> {
     type Output = Self;
     
-    fn mul(self, other: Color) -> Self::Output {
+    fn mul(self, other: Color<F>) -> Self::Output {
         Self {
             r: self.r * other.r,
             g: self.g * other.g,

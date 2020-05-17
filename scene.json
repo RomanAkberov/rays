@@ -1,53 +1,55 @@
 {
     "camera": {
-        "eye": [0.0, 0.0, 0.0],
-        "right": [4.0, 0.0, 0.0],
-        "up": [0.0, 2.25, 0.0]
+        "eye": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "right": {"x": 4.0, "y": 0.0, "z": 0.0},
+        "up": {"x": 0.0, "y": 2.25, "z": 0.0}
     },
     "background": {
-        "top": [0.5, 0.7, 1.0],
-        "bottom": [1.0, 1.0, 1.0]
+        "top": {"r": 0.5, "g": 0.7, "b": 1.0},
+        "bottom": {"r": 1.0, "g": 1.0, "b": 1.0}
     },
     "objects": [
         {
             "material": {
-                "albedo": [0.7, 0.3, 0.3],
-                "mode": "Diffuse"
+                "albedo": {"r": 0.7, "g": 0.3, "b": 0.3},
+                "mode": "Diffuse",
+                "fuzziness": 0
             },
             "shape": {
-                "center": [0.0, 0.0, -1.0],
+                "center": {"x": 0.0, "y": 0.0, "z": -1.0},
                 "radius": 0.5
             }
         },
         {
             "material": {
-                "albedo": [0.8, 0.8, 0.0],
-                "mode": "Diffuse"
+                "albedo": {"r": 0.8, "g": 0.8, "b": 0.0},
+                "mode": "Diffuse",
+                "fuzziness": 0
             },
             "shape": {
-                "center": [0, -100.5, -1],
+                "center": {"x": 0, "y": -100.5, "z": -1},
                 "radius": 100
             }
         },
         {
             "material": {
-                "albedo": [0.8, 0.6, 0.2],
+                "albedo": {"r": 0.8, "g": 0.6, "b": 0.2},
                 "mode": "Metallic",
                 "fuzziness": 0.3
             },
             "shape": {
-                "center": [1, 0, -1],
+                "center": {"x": 1, "y": 0, "z": -1},
                 "radius": 0.5
             }
         },
         {
             "material": {
-                "albedo": [0.8, 0.8, 0.8],
+                "albedo": {"r": 0.8, "g": 0.8, "b": 0.8},
                 "mode": "Metallic",
                 "fuzziness": 1.0
             },
             "shape": {
-                "center": [-1, 0, -1],
+                "center": {"x": -1, "y": 0, "z": -1},
                 "radius": 0.5
             }
         }
