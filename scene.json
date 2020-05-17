@@ -11,7 +11,8 @@
     "objects": [
         {
             "material": {
-                "albedo": [1.0, 0.0, 0.0]
+                "albedo": [0.7, 0.3, 0.3],
+                "mode": "Diffuse"
             },
             "shape": {
                 "center": [0.0, 0.0, -1.0],
@@ -20,11 +21,34 @@
         },
         {
             "material": {
-                "albedo": [0.0, 1.0, 0.0]
+                "albedo": [0.8, 0.8, 0.0],
+                "mode": "Diffuse"
             },
             "shape": {
                 "center": [0, -100.5, -1],
-                "radius": 100.0
+                "radius": 100
+            }
+        },
+        {
+            "material": {
+                "albedo": [0.8, 0.6, 0.2],
+                "mode": "Metallic",
+                "fuzziness": 0.3
+            },
+            "shape": {
+                "center": [1, 0, -1],
+                "radius": 0.5
+            }
+        },
+        {
+            "material": {
+                "albedo": [0.8, 0.8, 0.8],
+                "mode": "Metallic",
+                "fuzziness": 1.0
+            },
+            "shape": {
+                "center": [-1, 0, -1],
+                "radius": 0.5
             }
         }
     ]

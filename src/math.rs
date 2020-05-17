@@ -15,20 +15,20 @@ impl Vector3 {
         Self { x, y, z }
     }
 
-    pub fn normalized(&self) -> Self {
+    pub fn normalized(self) -> Self {
         let scale = 1.0 / self.length();
         Self::new(self.x * scale, self.y * scale, self.z * scale)
     }
 
-    pub fn length(&self) -> f64 {
+    pub fn length(self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
-    pub fn length_squared(&self) -> f64 {
+    pub fn length_squared(self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    pub fn dot(&self, other: &Self) -> f64 {
+    pub fn dot(self, other: Self) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 }

@@ -38,7 +38,7 @@ impl Random {
         }
     }
 
-    pub fn in_hemisphere(&mut self, normal: &Vector3) -> Vector3 {
+    pub fn in_hemisphere(&mut self, normal: Vector3) -> Vector3 {
         let in_sphere = self.in_sphere();
         if in_sphere.dot(normal) > 0.0 {
             in_sphere

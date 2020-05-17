@@ -17,9 +17,9 @@ pub struct Sphere {
 impl Sphere {
     pub fn hit(&self, ray: &Ray) -> Option<Hit> {
         let oc = ray.origin - self.center;
-        let a = ray.direction.dot(&ray.direction);
-        let b = ray.direction.dot(&oc);
-        let c = oc.dot(&oc) - self.radius * self.radius;
+        let a = ray.direction.dot(ray.direction);
+        let b = ray.direction.dot(oc);
+        let c = oc.dot(oc) - self.radius * self.radius;
         let d = b * b - a * c;
         if d < 0.0 {
             None
