@@ -15,6 +15,10 @@ pub struct Sphere {
 }
 
 impl Sphere {
+    pub fn distance(&self, point: Vector3) -> f64 {
+        self.center.distance(point) - self.radius
+    }
+
     pub fn hit(&self, ray: &Ray) -> Option<Hit> {
         let oc = ray.origin - self.center;
         let a = ray.direction.dot(ray.direction);

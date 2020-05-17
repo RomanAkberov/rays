@@ -1,5 +1,6 @@
 use serde::Deserialize;
 
+#[derive(Clone)]
 #[derive(Deserialize)]
 pub struct Config {
     pub width: u32,

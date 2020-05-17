@@ -28,6 +28,10 @@ impl Vector3 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
+    pub fn distance(self, other: Self) -> f64 {
+        (self - other).length()
+    }
+
     pub fn dot(self, other: Self) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
