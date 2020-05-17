@@ -1,7 +1,10 @@
-use std::ops;
+use std::{
+    fmt::Debug,
+    ops,
+};
 use serde::{Serialize, Deserialize};
 
-pub trait Float : Copy + Clone + Default + 
+pub trait Float : Copy + Clone + Default + Debug +
     PartialEq + PartialOrd +
     Sync + Send +
     Serialize + for<'d> Deserialize<'d> +
@@ -85,7 +88,7 @@ impl<F> Vector3<F> {
 
 impl<F: Float> Vector3<F> {
     pub const ZERO: Self = Self::new(F::ZERO, F::ZERO, F::ZERO);
-    
+
     pub fn normalized(self) -> Self {
         let scale = F::ONE / self.length();
         Self::new(self.x * scale, self.y * scale, self.z * scale)
@@ -105,6 +108,14 @@ impl<F: Float> Vector3<F> {
 
     pub fn dot(self, other: Self) -> F {
         self.x * other.x + self.y * other.y + self.z * other.z
+    }
+
+    pub fn cross(self, other: Self) -> Self {
+        Vector3 {
+            x: self.y * other.z - self.z * other.y,
+            y: self.z * other.x - self.x * other.z,
+            z: self.x * other.y - self.y * other.x,
+        }
     }
 }
 

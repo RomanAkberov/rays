@@ -5,7 +5,7 @@ mod config;
 mod def;
 mod image;
 mod material;
-mod math;
+pub mod math;
 mod object;
 mod random;
 mod ray_marcher;
