@@ -15,15 +15,15 @@ impl Random {
         Self { state }
     }
 
-    pub fn next_state(&mut self) {
+    pub fn next_state(&mut self) -> u32 {
         self.state ^= self.state << 13;
         self.state ^= self.state >> 17;
         self.state ^= self.state << 5;
+        self.state
     }
 
     pub fn range01(&mut self) -> f64 {
-        self.next_state();
-        self.state as f64 / 4294967296.0
+        self.next_state() as f64 / 4294967296.0
     }
 
     pub fn in_sphere(&mut self) -> Vector3 {

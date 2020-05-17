@@ -8,21 +8,17 @@ use crate::{
 pub const MIN_T: f64 = 0.0001;
 pub const MAX_T: f64 = 100.0;
 
-pub struct RayMarcher {
-    random: Random,
-}
+pub struct RayMarcher {}
 
 impl RayMarcher {
     pub fn new() -> Self {
-        Self {
-            random: Random::from_seed(42),
-        }
+        Self {}
     }
 }
 
 impl PixelRenderer for RayMarcher {
-    fn render_pixel(&mut self, scene: &Scene, pixel: Pixel) -> Color {
-        let uv = self.random.in_pixel(pixel);
+    fn render_pixel(&self, scene: &Scene, pixel: Pixel, random: &mut Random) -> Color {
+        let uv = random.in_pixel(pixel);
         let mut ray = scene.camera.ray(uv);
         loop {
             let hit = scene.objects
