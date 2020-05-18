@@ -5,5 +5,5 @@ use crate::{
 
 pub struct Object {
     pub shape: Box<dyn Shape>,
-    pub material: Material,
+    pub material: Box<dyn Material>,
 }

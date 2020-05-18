@@ -32,7 +32,7 @@ pub use background::Background;
 pub use color::Color;
 pub use config::{Config, ImageConfig, RenderMode};
 pub use def::{SceneDef, CameraDef};
-pub use material::{Material, Mode};
+pub use material::*;
 pub use math::*;
 pub use object::Object;
 pub use random::Random;

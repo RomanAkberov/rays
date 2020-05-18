@@ -18,10 +18,9 @@ fn main() -> RayResult<()> {
 
 fn scene() -> SceneDef {
     let mut objects = Vec::new();
-    let ground_material = Material {
-        mode: Mode::Diffuse,
-        albedo: Color::new(0.5, 0.5, 0.5),
-    };
+    let ground_material = Box::new(Diffuse {
+        color: Color::new(0.5, 0.5, 0.5),
+    });
     objects.push(Object {
         shape: Box::new(Sphere {
             center: Vec3([0.0, -1000.0, 0.0]),
@@ -40,31 +39,29 @@ fn scene() -> SceneDef {
                 b as Float + 0.9 * random.in_01(),
             ]);
             if center.distance(Vec3([4.0, 0.2, 0.0])) > 0.9 {
-                let material = if choose_mat < 0.8 {
+                let material: Box<dyn Material> = if choose_mat < 0.8 {
                     // diffuse
-                    Material {
-                        mode: Mode::Diffuse,
-                        albedo: Color {
+                    Box::new(Diffuse {
+                        color: Color {
                             r: random.in_01() * random.in_01(),
                             g: random.in_01() * random.in_01(),
                             b: random.in_01() * random.in_01(),
                         },
-                    }
+                    })
                 } else if choose_mat < 0.95 {
                     // metal
-                    Material {
-                        mode: Mode::Metallic(random.in_range(0.0, 0.5)),
-                        albedo: Color {
+                    Box::new(Metallic {
+                        fuzziness: random.in_range(0.0, 0.5),
+                        color: Color {
                             r: random.in_range(0.5, 1.0),
                             g: random.in_range(0.5, 1.0),
                             b: random.in_range(0.5, 1.0),
                         },
-                    }
+                    })
                 } else {
-                    Material {
-                        mode: Mode::Dielectric(1.5),
-                        albedo: Color::WHITE,
-                    }
+                    Box::new(Dielectric {
+                        index: 1.5,
+                    })
                 };
                 let shape = if choose_sphere {
                     Box::new(Sphere {
@@ -89,30 +86,28 @@ fn scene() -> SceneDef {
             center: Vec3([0.0, 1.0, 0.0]),
             radius: 1.0,
         }),
-        material: Material {
-            mode: Mode::Dielectric(1.5),
-            albedo: Color::WHITE,
-        }
+        material: Box::new(Dielectric {
+            index: 1.5,
+        })
     });
     objects.push(Object {
         shape: Box::new(Sphere {
             center: Vec3([-4.0, 1.0, 0.0]),
             radius: 1.0,
         }),
-        material: Material {
-            mode: Mode::Diffuse,
-            albedo: Color::new(0.4, 0.2, 0.1),
-        }
+        material: Box::new(Diffuse {
+            color: Color::new(0.4, 0.2, 0.1),
+        }),
     });
     objects.push(Object {
         shape: Box::new(Sphere {
             center: Vec3([4.0, 1.0, 0.0]),
             radius: 1.0,
         }),
-        material: Material {
-            mode: Mode::Metallic(0.0),
-            albedo: Color::new(0.7, 0.6, 0.5),
-        }
+        material: Box::new(Metallic {
+            fuzziness: 0.0,
+            color: Color::new(0.7, 0.6, 0.5),
+        }),
     });
     SceneDef {
         camera: CameraDef {
