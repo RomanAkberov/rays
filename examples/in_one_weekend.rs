@@ -4,8 +4,8 @@ fn main() -> RayResult<()> {
     let config = Config {
         image: ImageConfig {
             path: "ray-marcher.png".to_string(),
-            width: 64,
-            height: 48,
+            width: 640,
+            height: 480,
             gamma_correction: true,
         },
         max_depth: 50,
@@ -24,7 +24,7 @@ fn scene() -> SceneDef {
     };
     objects.push(Object {
         shape: Box::new(Sphere {
-            center: Vec3::new(0.0, -1000.0, 0.0),
+            center: Vec3([0.0, -1000.0, 0.0]),
             radius: 1000.0,
         }),
         material: ground_material,
@@ -33,21 +33,21 @@ fn scene() -> SceneDef {
     for a in -11 .. 11 {
         for b in -11 .. 11 {
             let choose_sphere = random.probability(0.5);
-            let choose_mat = random.range01();
-            let center = Vec3::new(
-                a as Float + 0.9 * random.range01(), 
+            let choose_mat = random.in_01();
+            let center = Vec3([
+                a as Float + 0.9 * random.in_01(), 
                 0.2,
-                b as Float + 0.9 * random.range01(),
-            );
-            if center.distance(Vec3::new(4.0, 0.2, 0.0)) > 0.9 {
+                b as Float + 0.9 * random.in_01(),
+            ]);
+            if center.distance(Vec3([4.0, 0.2, 0.0])) > 0.9 {
                 let material = if choose_mat < 0.8 {
                     // diffuse
                     Material {
                         mode: Mode::Diffuse,
                         albedo: Color {
-                            r: random.range01() * random.range01(),
-                            g: random.range01() * random.range01(),
-                            b: random.range01() * random.range01(),
+                            r: random.in_01() * random.in_01(),
+                            g: random.in_01() * random.in_01(),
+                            b: random.in_01() * random.in_01(),
                         },
                     }
                 } else if choose_mat < 0.95 {
@@ -86,7 +86,7 @@ fn scene() -> SceneDef {
     }
     objects.push(Object {
         shape: Box::new(Sphere {
-            center: Vec3::new(0.0, 1.0, 0.0),
+            center: Vec3([0.0, 1.0, 0.0]),
             radius: 1.0,
         }),
         material: Material {
@@ -96,7 +96,7 @@ fn scene() -> SceneDef {
     });
     objects.push(Object {
         shape: Box::new(Sphere {
-            center: Vec3::new(-4.0, 1.0, 0.0),
+            center: Vec3([-4.0, 1.0, 0.0]),
             radius: 1.0,
         }),
         material: Material {
@@ -106,7 +106,7 @@ fn scene() -> SceneDef {
     });
     objects.push(Object {
         shape: Box::new(Sphere {
-            center: Vec3::new(4.0, 1.0, 0.0),
+            center: Vec3([4.0, 1.0, 0.0]),
             radius: 1.0,
         }),
         material: Material {
@@ -116,7 +116,7 @@ fn scene() -> SceneDef {
     });
     SceneDef {
         camera: CameraDef {
-            eye: Vec3::new(13.0, 2.0, 3.0),
+            eye: Vec3([13.0, 2.0, 3.0]),
             target: Vec3::ZERO,
             fov: 20.0,
             aperture: 0.0,

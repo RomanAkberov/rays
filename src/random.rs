@@ -22,25 +22,25 @@ impl Random {
         self.state
     }
 
-    pub fn range01(&mut self) -> Float {
+    pub fn in_01(&mut self) -> Float {
         self.next_state() as Float / 4294967296.0
     }
 
     pub fn in_range(&mut self, min: Float, max: Float) -> Float {
-        min + (max - min) * self.range01()
+        min + (max - min) * self.in_01()
     }
 
     pub fn probability(&mut self, probability: Float) -> bool {
-        self.range01() < probability
+        self.in_01() < probability
     }
 
     pub fn in_sphere(&mut self) -> Vec3 {
         loop {
-            let v = Vec3::new(
+            let v = Vec3([
                 self.in_range(-1.0, 1.0), 
                 self.in_range(-1.0, 1.0),
                 self.in_range(-1.0, 1.0),
-            );
+            ]);
             if v.len2() < 1.0 {
                 return v;
             }
@@ -58,10 +58,10 @@ impl Random {
 
     pub fn in_disk(&mut self) -> Vec2 {
         loop {
-            let v = Vec2::new(
+            let v = Vec2([
                 self.in_range(-1.0, 1.0), 
                 self.in_range(-1.0, 1.0), 
-            );
+            ]);
             if v.len2() < 1.0 {
                 return v;
             }
@@ -69,9 +69,9 @@ impl Random {
     }
 
     pub fn in_pixel(&mut self, pixel: Pixel) -> Vec2 {
-        Vec2 {
-            x: (pixel.coord.x + self.range01()) / (pixel.frame_size.x - 1.0),
-            y: 1.0 - (pixel.coord.y + self.range01()) / (pixel.frame_size.y - 1.0),
-        }
+        Vec2([
+            (pixel.coord[0] + self.in_01()) / (pixel.frame_size[0] - 1.0),
+            1.0 - (pixel.coord[1] + self.in_01()) / (pixel.frame_size[1] - 1.0),
+        ])
     }
 }

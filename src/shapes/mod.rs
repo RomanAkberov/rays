@@ -15,13 +15,24 @@ pub trait Shape: Sync {
 }
 
 impl Shape for Aabb3 {
-    fn hit(&self, _ray: &Ray) -> Option<Hit> {
+    fn hit(&self, ray: &Ray) -> Option<Hit> {
+        // let tmin = (self.min - ray.origin) / ray.direction;
+        // let tmax = (self.max - ray.origin) / ray.direction;
+        // let rmin = tmin.min(tmax); 
+        // let rmax = tmin.max(tmax);
+        // let minmax = rmin.maxcomp();
+        // let maxmin = rmax.mincomp();
+        // if minmax >= maxmin {
+        //     Some(Hit { t: maxmin, normal: Vec3::new(0.0, 1.0, 0.0) })
+        // } else {
+        //     None
+        // }
         None
     }
 
     fn sdf(&self, point: Vec3) -> Float {
         let p = point - self.center();
         let q = p.abs() - self.diagonal() * 0.5;
-        q.max(Vec3::ZERO).len() + q.x.max(q.y).max(q.z).min(0.0)
+        q.max(Vec3::ZERO).len() + q.maxcomp().min(0.0)
     }
 }

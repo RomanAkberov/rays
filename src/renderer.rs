@@ -56,7 +56,7 @@ impl<P: PixelRenderer> Renderer<P> {
 
         let width = config.width;
         let height = config.height;
-        let frame_size = Vec2::new(width as Float, height as Float);
+        let frame_size = Vec2([width as Float, height as Float]);
         let colors: Vec<Vec<Color>> = (0 .. height)
             .map(|j| (j, Random::new(42 + j)))
             .collect::<Vec<_>>()
@@ -65,7 +65,7 @@ impl<P: PixelRenderer> Renderer<P> {
                 let mut colors = Vec::with_capacity(width as usize);
                 for i in 0 .. width {
                     let pixel = Pixel {
-                        coord: Vec2::new(i as Float, j as Float),
+                        coord: Vec2([i as Float, j as Float]),
                         frame_size,
                     };
                     let mut color = self.pixel_renderer.render_pixel(scene, pixel, &mut random);

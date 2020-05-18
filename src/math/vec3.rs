@@ -1,39 +1,33 @@
-use std::ops::{Add, Sub, Mul, Neg};
+use std::ops::*;
 use serde::Deserialize;
 use super::Float;
 
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 #[derive(Deserialize)]
-pub struct Vec3 {
-    pub x: Float,
-    pub y: Float,
-    pub z: Float,
-}
+pub struct Vec3(pub [Float; 3]);
 
 impl Vec3 {
-    pub const fn new(x: Float, y: Float, z: Float) -> Self {
-        Self { x, y, z }
-    }
-
     pub const fn splat(v: Float) -> Self {
-        Self { x: v, y: v, z: v }
+        Self([v, v, v])
     }
-}
 
-impl Vec3 {
-    pub const ZERO: Self = Self::new(0.0, 0.0, 0.0);
+    pub const ZERO: Self = Self([0.0, 0.0, 0.0]);
 
     pub fn normalized(self) -> Self {
         let scale = 1.0 / self.len();
-        Self::new(self.x * scale, self.y * scale, self.z * scale)
+        Self([
+            self[0] * scale, 
+            self[1] * scale, 
+            self[2] * scale,
+        ])
     }
 
     pub fn len(self) -> Float {
-        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+        (self[0] * self[0] + self[1] * self[1] + self[2] * self[2]).sqrt()
     }
 
     pub fn len2(self) -> Float {
-        self.x * self.x + self.y * self.y + self.z * self.z
+        self[0] * self[0] + self[1] * self[1] + self[2] * self[2]
     }
 
     pub fn distance(self, other: Self) -> Float {
@@ -41,37 +35,53 @@ impl Vec3 {
     }
 
     pub fn dot(self, other: Self) -> Float {
-        self.x * other.x + self.y * other.y + self.z * other.z
+        self[0] * other[0] + self[1] * other[1] + self[2] * other[2]
     }
 
     pub fn cross(self, other: Self) -> Self {
-        Vec3 {
-            x: self.y * other.z - self.z * other.y,
-            y: self.z * other.x - self.x * other.z,
-            z: self.x * other.y - self.y * other.x,
-        }
+        Self([
+            self[1] * other[2] - self[2] * other[1],
+            self[2] * other[0] - self[0] * other[2],
+            self[0] * other[1] - self[1] * other[0],
+        ])
     }
 
     pub fn min(self, other: Self) -> Self {
-        Vec3::new(self.x.min(other.x), self.y.min(other.y), self.z.min(other.z))
+        Self([
+            self[0].min(other[0]), 
+            self[1].min(other[1]), 
+            self[2].min(other[2]),
+        ])
     }
     
     pub fn max(self, other: Self) -> Self {
-        Vec3::new(self.x.max(other.x), self.y.max(other.y), self.z.max(other.z))
+        Self([
+            self[0].max(other[0]), 
+            self[1].max(other[1]), 
+            self[2].max(other[2]),
+        ])
     }
 
     pub fn abs(self) -> Self {
-        Vec3::new(self.x.abs(), self.y.abs(), self.z.abs())
+        Self([
+            self[0].abs(), 
+            self[1].abs(), 
+            self[2].abs(),
+        ])
+    }
+
+    pub fn mincomp(self) -> Float {
+        self[0].min(self[1]).min(self[2])
+    }
+
+    pub fn maxcomp(self) -> Float {
+        self[0].max(self[1]).max(self[2])
     }
 }
 
 impl From<[Float; 3]> for Vec3 {
     fn from(array: [Float; 3]) -> Self {
-        Self {
-            x: array[0],
-            y: array[1],
-            z: array[2],
-        }
+        Self(array)
     }
 }
 
@@ -79,7 +89,11 @@ impl Add for Vec3 {
     type Output = Self;
 
     fn add(self, other: Self) -> Self::Output {
-        Self::new(self.x + other.x, self.y + other.y, self.z + other.z)
+        Self([
+            self[0] + other[0],
+            self[1] + other[1],
+            self[2] + other[2],
+        ])
     }
 }
 
@@ -87,15 +101,11 @@ impl Sub for Vec3 {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self::Output {
-        Self::new(self.x - other.x, self.y - other.y, self.z - other.z)
-    }
-}
-
-impl Mul<Float> for Vec3 {
-    type Output = Self;
-
-    fn mul(self, other: Float) -> Self::Output {
-        Self::new(self.x * other, self.y * other, self.z * other)
+        Self([
+            self[0] - other[0],
+            self[1] - other[1],
+            self[2] - other[2],
+        ])
     }
 }
 
@@ -103,6 +113,48 @@ impl Neg for Vec3 {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        Self::new(-self.x, -self.y, -self.z)
+        Self([
+            -self[0], 
+            -self[1], 
+            -self[2],
+        ])
+    }
+}
+
+impl Mul<Float> for Vec3 {
+    type Output = Self;
+
+    fn mul(self, other: Float) -> Self::Output {
+        Self([
+            self[0] * other, 
+            self[1] * other, 
+            self[2] * other,
+        ])
+    }
+}
+
+impl Div for Vec3 {
+    type Output = Self;
+
+    fn div(self, other: Self) -> Self::Output {
+        Self([
+            self[0] / other[0], 
+            self[1] / other[1], 
+            self[2] / other[2],
+        ])
+    }
+}
+
+impl Deref for Vec3 {
+    type Target = [Float; 3];
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for Vec3 {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }

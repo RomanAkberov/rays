@@ -18,7 +18,7 @@ impl Scene {
             camera: Camera::new(
                 def.camera.eye, 
                 def.camera.target,
-                Vec3::new(0.0, 1.0, 0.0),
+                Vec3([0.0, 1.0, 0.0]),
                 def.camera.fov, 
                 aspect,
                 def.camera.aperture,
