@@ -36,7 +36,7 @@ pub use material::{Material, Mode};
 pub use math::*;
 pub use object::Object;
 pub use random::Random;
-pub use shapes::Sphere;
+pub use shapes::*;
 
 pub type RayResult<T> = Result<T, Box<dyn std::error::Error>>;
 
@@ -86,8 +86,4 @@ pub fn run_scene(config: &Config, scene: SceneDef) -> RayResult<()> {
         RenderMode::RayMarcher => render(RayMarcher::new(), &scene, &config)?,
     }
     Ok(())
-}
-
-pub fn run_file(config: &Config, path: &str) -> RayResult<()> {
-    run_scene(config, load_json(path)?)
 }

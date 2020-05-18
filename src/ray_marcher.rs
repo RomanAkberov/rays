@@ -26,13 +26,13 @@ impl PixelRenderer for RayMarcher {
         loop {
             let hit = scene.objects
                 .iter()
-                .map(|obj| (obj, obj.shape.distance(ray.origin)))
+                .map(|obj| (obj, obj.shape.sdf(ray.origin)))
                 .min_by(|hit1, hit2| hit1.1.partial_cmp(&hit2.1).unwrap());
             if let Some((obj, t)) = hit {
-                if t >= T_MIN {
+                if t > T_MAX {
                     return scene.background.color(&ray);
                 }
-                if t <= T_MAX {
+                if t < T_MIN {
                     return obj.material.albedo;
                 }
                 ray.origin = ray.at(t);

@@ -23,7 +23,7 @@ impl RayTracer {
         }
         let hit = scene.objects
             .iter()
-            .flat_map(|object| object.shape.hit(&ray).map(|hit| (hit, &object.material)))
+            .flat_map(|object| object.shape.hit(ray).map(|hit| (hit, &object.material)))
             .min_by(|hit1, hit2| hit1.0.t.partial_cmp(&hit2.0.t).unwrap());
         if let Some((hit, material)) = hit {
             if let Some((color, ray)) = material.scatter(ray, &hit, random) {

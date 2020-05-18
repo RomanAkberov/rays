@@ -1,11 +1,9 @@
-use serde::Deserialize;
 use crate::{
-    shapes::Sphere,
+    shapes::Shape,
     material::Material,
 };
 
-#[derive(Deserialize)]
 pub struct Object {
-    pub shape: Sphere,
+    pub shape: Box<dyn Shape>,
     pub material: Material,
 }
