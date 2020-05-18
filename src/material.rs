@@ -1,26 +1,26 @@
 use serde::{Serialize, Deserialize};
 use crate::{
     color::Color,
-    math::{Float, Ray, Vector3},
+    math::{Float, Ray, Vec3},
     random::Random,
     shapes::Hit,
 };
 
 #[derive(Serialize, Deserialize)]
-pub enum Mode<F> {
+pub enum Mode {
     Diffuse,
-    Metallic(F),
-    Dielectric(F),
+    Metallic(Float),
+    Dielectric(Float),
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Material<F> {
-    pub mode: Mode<F>,
-    pub albedo: Color<F>,
+pub struct Material {
+    pub mode: Mode,
+    pub albedo: Color,
 }
 
-impl<F: Float> Material<F> {
-    pub fn scatter(&self, ray: &Ray<F>, hit: &Hit<F>, random: &mut Random) -> Option<(Color<F>, Ray<F>)> {
+impl Material {
+    pub fn scatter(&self, ray: &Ray, hit: &Hit, random: &mut Random) -> Option<(Color, Ray)> {
         let origin = ray.at(hit.t);
         let (albedo, direction) = match self.mode {
             Mode::Diffuse => {
@@ -28,7 +28,7 @@ impl<F: Float> Material<F> {
             }
             Mode::Metallic(fuzziness) => {
                 let reflected = reflect(ray.direction.normalized(), hit.normal);
-                let direction = if fuzziness > F::ZERO {
+                let direction = if fuzziness > 0.0 {
                     reflected + random.in_sphere() * fuzziness
                 } else {
                     reflected
@@ -36,15 +36,15 @@ impl<F: Float> Material<F> {
                 (self.albedo, direction)
             }
             Mode::Dielectric(reflection_index) => {
-                let (normal, eta) = if ray.direction.dot(hit.normal) < F::ZERO {
-                    (hit.normal, F::ONE / reflection_index)
+                let (normal, eta) = if ray.direction.dot(hit.normal) < 0.0 {
+                    (hit.normal, 1.0 / reflection_index)
                 } else {
                     (-hit.normal, reflection_index)
                 };
                 // TODO do not compute cos_theta twice (here and in refract)?
-                let cos_theta = ray.direction.dot(-normal).min(F::ONE);
-                let sin_theta = (F::ONE - cos_theta * cos_theta).sqrt();
-                if eta * sin_theta > F::ONE || random.probability(schlick(cos_theta, eta)) {
+                let cos_theta = ray.direction.dot(-normal).min(1.0);
+                let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+                if eta * sin_theta > 1.0 || random.probability(schlick(cos_theta, eta)) {
                     (Color::WHITE, reflect(ray.direction, normal))
                 } else {
                     (Color::WHITE, refract(ray.direction, normal, eta)) 
@@ -56,19 +56,19 @@ impl<F: Float> Material<F> {
     }
 }
 
-fn schlick<F: Float>(cosine: F, eta: F) -> F {
-    let mut r0 = (F::ONE - eta) / (F::ONE + eta);
+fn schlick(cosine: Float, eta: Float) -> Float {
+    let mut r0 = (1.0 - eta) / (1.0 + eta);
     r0 *= r0;
-    return r0 + (F::ONE - r0) * (F::ONE - cosine).powi(5)
+    return r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
 }
 
-fn reflect<F: Float>(vector: Vector3<F>, normal: Vector3<F>) -> Vector3<F> {
-    vector - normal * F::TWO * vector.dot(normal)
+fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
+    vector - normal * 2.0 * vector.dot(normal)
 }
 
-fn refract<F: Float>(vector: Vector3<F>, normal: Vector3<F>, eta: F) -> Vector3<F> {
+fn refract(vector: Vec3, normal: Vec3, eta: Float) -> Vec3 {
     let cos_theta = normal.dot(-vector);
     let parallel = (vector + normal * cos_theta) * eta;
-    let perp = normal * -(F::ONE - parallel.length_squared()).sqrt();
+    let perp = normal * -(1.0 - parallel.len2()).sqrt();
     parallel + perp
 }

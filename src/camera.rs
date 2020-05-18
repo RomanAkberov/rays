@@ -1,35 +1,35 @@
 use crate::{
-    math::{Float, Ray, Vector2, Vector3},
+    math::{Float, Ray, Vec2, Vec3},
     random::Random,
 };
 
-pub struct Camera<F> {
-    eye: Vector3<F>, 
-    right: Vector3<F>,
-    up: Vector3<F>,
-    forward: Vector3<F>,
-    viewport: Vector2<F>,
-    lens_radius: F,
-    focus: F,
+pub struct Camera {
+    eye: Vec3, 
+    right: Vec3,
+    up: Vec3,
+    forward: Vec3,
+    viewport: Vec2,
+    lens_radius: Float,
+    focus: Float,
 }
 
-impl<F: Float> Camera<F> {
+impl Camera {
     pub fn new(
-        eye: Vector3<F>, 
-        target: Vector3<F>, 
-        up: Vector3<F>, 
-        fov: F, 
-        aspect: F,
-        aperture: F,
+        eye: Vec3, 
+        target: Vec3, 
+        up: Vec3, 
+        fov: Float, 
+        aspect: Float,
+        aperture: Float,
     ) -> Self {
-        let theta = fov.to().to_radians();
-        let height = F::of(2.0 * (0.5 * theta).tan());
-        let viewport = Vector2::new(height * aspect, height);
+        let theta = fov.to_radians();
+        let height = 2.0 * (0.5 * theta).tan();
+        let viewport = Vec2::new(height * aspect, height);
         let forward = (target - eye).normalized();
         let right = forward.cross(up).normalized();
         let up = right.cross(forward);
-        let lens_radius = F::HALF * aperture;
-        let focus = (target - eye).length();
+        let lens_radius = 0.5 * aperture;
+        let focus = (target - eye).len();
         Self {
             eye,
             right,
@@ -41,7 +41,7 @@ impl<F: Float> Camera<F> {
         }
     }
 
-    pub fn ray(&self, uv: Vector2<F>, random: &mut Random) -> Ray<F> {
+    pub fn ray(&self, uv: Vec2, random: &mut Random) -> Ray {
         let rd = random.in_disk() * self.lens_radius;
         let offset = self.right * rd.x + self.up * rd.y;
         Ray {
@@ -49,8 +49,8 @@ impl<F: Float> Camera<F> {
             direction: (
                 (
                     self.forward + 
-                    self.right * self.viewport.x * (uv.x - F::HALF) + 
-                    self.up * self.viewport.y * (uv.y - F::HALF)
+                    self.right * self.viewport.x * (uv.x - 0.5) + 
+                    self.up * self.viewport.y * (uv.y - 0.5)
                 ) * self.focus - offset
             ).normalized(),
         }

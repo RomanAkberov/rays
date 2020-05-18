@@ -25,22 +25,22 @@ use image::Image;
 use ray_marcher::RayMarcher;
 use ray_tracer::RayTracer;
 use progress::{Progress, ConsoleProgress, NoProgress};
-use renderer::{Renderer, PixelRenderer, Supersampler};
+use renderer::{Renderer, PixelRenderer, Multisampler};
 use scene::Scene;
 
 pub use background::Background;
 pub use color::Color;
-pub use config::{Config, ImageConfig, Precision, RenderMode};
+pub use config::{Config, ImageConfig, RenderMode};
 pub use def::{SceneDef, CameraDef};
 pub use material::{Material, Mode};
-pub use math::{Float, Vector3};
+pub use math::*;
 pub use object::Object;
 pub use random::Random;
 pub use shapes::Sphere;
 
 pub type RayResult<T> = Result<T, Box<dyn std::error::Error>>;
 
-fn save_png<F: Float>(image: &Image<F>, path: &str) -> RayResult<()> {
+fn save_png(image: &Image, path: &str) -> RayResult<()> {
     let file = File::create(path)?;
     let ref mut writer = BufWriter::new(file);
     let mut encoder = png::Encoder::new(writer, image.width, image.height);
@@ -49,9 +49,9 @@ fn save_png<F: Float>(image: &Image<F>, path: &str) -> RayResult<()> {
     let mut writer = encoder.write_header()?;
     let mut bytes = vec![0u8; 3 * image.colors.len()];
     for (i, color) in image.colors.iter().enumerate() {
-        bytes[3 * i] = (color.r.to().min(1.0) * 255.0) as u8;
-        bytes[3 * i + 1] = (color.g.to().min(1.0) * 255.0) as u8;
-        bytes[3 * i + 2] = (color.b.to().min(1.0) * 255.0) as u8;
+        bytes[3 * i] = (color.r.min(1.0) * 255.0) as u8;
+        bytes[3 * i + 1] = (color.g.min(1.0) * 255.0) as u8;
+        bytes[3 * i + 2] = (color.b.min(1.0) * 255.0) as u8;
     }
     writer.write_image_data(&bytes)?;
     Ok(())
@@ -63,8 +63,8 @@ pub fn load_json<T: for <'d> Deserialize<'d>>(path: &str) -> RayResult<T> {
     Ok(value)
 }
 
-fn render<F: Float, P: PixelRenderer>(pixel_renderer: P, scene: &Scene<F>, config: &Config) -> RayResult<()> {
-    let mut renderer = Renderer::new(Supersampler::new(pixel_renderer, config.samples));
+fn render<P: PixelRenderer>(pixel_renderer: P, scene: &Scene, config: &Config) -> RayResult<()> {
+    let mut renderer = Renderer::new(Multisampler::new(pixel_renderer, config.samples));
     let start = Instant::now();
     let progress = if config.show_progress {
         Box::new(ConsoleProgress::default()) as Box<dyn Progress>
@@ -78,8 +78,8 @@ fn render<F: Float, P: PixelRenderer>(pixel_renderer: P, scene: &Scene<F>, confi
     save_png(&image, &config.image.path)
 }
 
-pub fn run_scene<F: Float>(config: &Config, scene: SceneDef<F>) -> RayResult<()> {
-    let aspect = F::of(config.image.width as f64 / config.image.height as f64);
+pub fn run_scene(config: &Config, scene: SceneDef) -> RayResult<()> {
+    let aspect = config.image.width as Float / config.image.height as Float;
     let scene = Scene::load(scene, aspect);
     match config.renderer {
         RenderMode::RayTracer => render(RayTracer::new(config.max_depth), &scene, &config)?,
@@ -88,27 +88,6 @@ pub fn run_scene<F: Float>(config: &Config, scene: SceneDef<F>) -> RayResult<()>
     Ok(())
 }
 
-pub fn run_loader<L: SceneLoader>(config: &Config, loader: L) -> RayResult<()> {
-    match config.precision {
-        config::Precision::F32 => run_scene(config, loader.load::<f32>()?),
-        config::Precision::F64 => run_scene(config, loader.load::<f64>()?),
-    }
-}
-
 pub fn run_file(config: &Config, path: &str) -> RayResult<()> {
-    run_loader(config, FileLoader { path })
-}
-
-pub trait SceneLoader {
-    fn load<F: Float>(self) -> RayResult<SceneDef<F>>; 
-}
-
-pub struct FileLoader<'a> {
-    path: &'a str,
-}
-
-impl<'a> SceneLoader for FileLoader<'a> {
-    fn load<F: Float>(self) -> RayResult<SceneDef<F>> {
-        load_json(self.path)
-    }
+    run_scene(config, load_json(path)?)
 }

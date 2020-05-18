@@ -1,7 +1,7 @@
 use crate::{
     color::Color,
     config::ImageConfig,
-    math::{Float, Vector2},
+    math::{Float, Vec2},
     image::Image,
     progress::Progress,
     random::Random,
@@ -9,29 +9,29 @@ use crate::{
 };
 
 #[derive(Copy, Clone)]
-pub struct Pixel<F: Float> {
-    pub coord: Vector2<F>,
-    pub frame_size: Vector2<F>,
+pub struct Pixel {
+    pub coord: Vec2,
+    pub frame_size: Vec2,
 }
 
 pub trait PixelRenderer: Sync + Send {
-    fn render_pixel<F: Float>(&self, scene: &Scene<F>, pixel: Pixel<F>, random: &mut Random) -> Color<F>;
+    fn render_pixel(&self, scene: &Scene, pixel: Pixel, random: &mut Random) -> Color;
 }
 
-pub struct Supersampler<P: PixelRenderer> {
+pub struct Multisampler<P: PixelRenderer> {
     inner: P,
     samples: u32,
 }
 
-impl<P: PixelRenderer> Supersampler<P> {
+impl<P: PixelRenderer> Multisampler<P> {
     pub fn new(inner: P, samples: u32) -> Self {
         Self { inner, samples }
     }
 }
 
-impl<P: PixelRenderer> PixelRenderer for Supersampler<P> {
-    fn render_pixel<F: Float>(&self, scene: &Scene<F>, pixel: Pixel<F>, random: &mut Random) -> Color<F> {
-        let scale = F::of(1.0 / self.samples as f64);
+impl<P: PixelRenderer> PixelRenderer for Multisampler<P> {
+    fn render_pixel(&self, scene: &Scene, pixel: Pixel, random: &mut Random) -> Color {
+        let scale = 1.0 / self.samples as Float;
         let mut color = Color::BLACK;
         for _ in 0 .. self.samples {
             color += self.inner.render_pixel(scene, pixel, random);
@@ -51,21 +51,21 @@ impl<P: PixelRenderer> Renderer<P> {
 }
 
 impl<P: PixelRenderer> Renderer<P> {
-    pub fn render<F: Float>(&mut self, scene: &Scene<F>, config: &ImageConfig, progress: &dyn Progress) -> Image<F> {
+    pub fn render(&mut self, scene: &Scene, config: &ImageConfig, progress: &dyn Progress) -> Image {
         use rayon::prelude::*;
 
         let width = config.width;
         let height = config.height;
-        let frame_size = Vector2::new(F::of(width as f64), F::of(height as f64));
-        let colors: Vec<Vec<Color<F>>> = (0 .. height)
-            .map(|j| (j, Random::from_seed(42 + j)))
+        let frame_size = Vec2::new(width as Float, height as Float);
+        let colors: Vec<Vec<Color>> = (0 .. height)
+            .map(|j| (j, Random::new(42 + j)))
             .collect::<Vec<_>>()
             .into_par_iter()
             .map(|(j, mut random)| {
                 let mut colors = Vec::with_capacity(width as usize);
                 for i in 0 .. width {
                     let pixel = Pixel {
-                        coord: Vector2::new(F::of(i as f64), F::of(j as f64)),
+                        coord: Vec2::new(i as Float, j as Float),
                         frame_size,
                     };
                     let mut color = self.pixel_renderer.render_pixel(scene, pixel, &mut random);

@@ -2,23 +2,23 @@ use crate::{
     background::Background,
     camera::Camera,
     def::SceneDef,
-    math::{Float, Vector3},
+    math::{Float, Vec3},
     object::Object,
 };
 
-pub struct Scene<F> {
-    pub camera: Camera<F>,
-    pub background: Background<F>,
-    pub objects: Vec<Object<F>>,
+pub struct Scene {
+    pub camera: Camera,
+    pub background: Background,
+    pub objects: Vec<Object>,
 }
 
-impl<F: Float> Scene<F> {
-    pub fn load(def: SceneDef<F>, aspect: F) -> Self {
+impl Scene {
+    pub fn load(def: SceneDef, aspect: Float) -> Self {
         Self {
             camera: Camera::new(
                 def.camera.eye, 
                 def.camera.target,
-                Vector3::new(F::ZERO, F::ONE, F::ZERO),
+                Vec3::new(0.0, 1.0, 0.0),
                 def.camera.fov, 
                 aspect,
                 def.camera.aperture,

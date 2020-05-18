@@ -1,6 +1,6 @@
 use crate::{
     color::Color,
-    math::{Float, Ray},
+    math::Ray,
     random::Random,
     renderer::{PixelRenderer, Pixel},
     scene::Scene,
@@ -17,7 +17,7 @@ impl RayTracer {
         }
     }
 
-    fn cast_ray<F: Float>(&self, ray: &Ray<F>, scene: &Scene<F>, depth: u32, random: &mut Random) -> Color<F> {
+    fn cast_ray(&self, ray: &Ray, scene: &Scene, depth: u32, random: &mut Random) -> Color {
         if depth == 0 {
             return Color::BLACK;
         }
@@ -37,7 +37,7 @@ impl RayTracer {
 }
 
 impl PixelRenderer for RayTracer {
-    fn render_pixel<F: Float>(&self, scene: &Scene<F>, pixel: Pixel<F>, random: &mut Random) -> Color<F> {
+    fn render_pixel(&self, scene: &Scene, pixel: Pixel, random: &mut Random) -> Color {
         let ray = scene.camera.ray(random.in_pixel(pixel), random);
         self.cast_ray(&ray, scene, self.max_depth, random)
     }

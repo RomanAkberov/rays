@@ -5,7 +5,7 @@ use crate::{
 };
 
 #[derive(Deserialize)]
-pub struct Object<F> {
-    pub shape: Sphere<F>,
-    pub material: Material<F>,
+pub struct Object {
+    pub shape: Sphere,
+    pub material: Material,
 }

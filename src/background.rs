@@ -1,18 +1,18 @@
 use serde::Deserialize;
 use crate::{
     color::Color,
-    math::{Float, Ray},
+    math::Ray,
 };
 
 #[derive(Deserialize)]
-pub struct Background<F> {
-    pub top: Color<F>,
-    pub bottom: Color<F>,
+pub struct Background {
+    pub top: Color,
+    pub bottom: Color,
 }
 
-impl<F: Float> Background<F> {
-    pub fn color(&self, ray: &Ray<F>) -> Color<F> {
-        let t = F::HALF * (ray.direction.y + F::ONE);
+impl Background {
+    pub fn color(&self, ray: &Ray) -> Color {
+        let t = 0.5 * (ray.direction.y + 1.0);
         self.bottom.lerp(&self.top, t)
     }
 }

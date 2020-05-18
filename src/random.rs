@@ -1,4 +1,4 @@
-use crate::math::{Float, Vector2, Vector3};
+use crate::math::{Float, Vec2, Vec3};
 use crate::renderer::Pixel;
 
 pub struct Random {
@@ -6,7 +6,7 @@ pub struct Random {
 }
 
 impl Random {
-    pub fn from_seed(seed: u32) -> Self {
+    pub fn new(seed: u32) -> Self {
         let state = if seed != 0 {
             seed
         } else {
@@ -22,56 +22,56 @@ impl Random {
         self.state
     }
 
-    pub fn range01<F: Float>(&mut self) -> F {
-        F::of(self.next_state() as f64 / 4294967296.0)
+    pub fn range01(&mut self) -> Float {
+        self.next_state() as Float / 4294967296.0
     }
 
-    pub fn in_range<F: Float>(&mut self, min: F, max: F) -> F {
+    pub fn in_range(&mut self, min: Float, max: Float) -> Float {
         min + (max - min) * self.range01()
     }
 
-    pub fn probability<F: Float>(&mut self, probability: F) -> bool {
-        self.range01::<F>() < probability
+    pub fn probability(&mut self, probability: Float) -> bool {
+        self.range01() < probability
     }
 
-    pub fn in_sphere<F: Float>(&mut self) -> Vector3<F> {
+    pub fn in_sphere(&mut self) -> Vec3 {
         loop {
-            let v = Vector3::new(
-                self.in_range::<F>(-F::ONE, F::ONE), 
-                self.in_range::<F>(-F::ONE, F::ONE),
-                self.in_range::<F>(-F::ONE, F::ONE),
+            let v = Vec3::new(
+                self.in_range(-1.0, 1.0), 
+                self.in_range(-1.0, 1.0),
+                self.in_range(-1.0, 1.0),
             );
-            if v.length_squared() < F::ONE {
+            if v.len2() < 1.0 {
                 return v;
             }
         }
     }
 
-    pub fn in_hemisphere<F: Float>(&mut self, normal: Vector3<F>) -> Vector3<F> {
+    pub fn in_hemisphere(&mut self, normal: Vec3) -> Vec3 {
         let in_sphere = self.in_sphere();
-        if in_sphere.dot(normal) > F::ZERO {
+        if in_sphere.dot(normal) > 0.0 {
             in_sphere
         } else {
             -in_sphere
         }
     }
 
-    pub fn in_disk<F: Float>(&mut self) -> Vector2<F> {
+    pub fn in_disk(&mut self) -> Vec2 {
         loop {
-            let v = Vector2::new(
-                self.in_range::<F>(-F::ONE, F::ONE),
-                self.in_range::<F>(-F::ONE, F::ONE),
+            let v = Vec2::new(
+                self.in_range(-1.0, 1.0), 
+                self.in_range(-1.0, 1.0), 
             );
-            if v.length_squared() < F::ONE {
+            if v.len2() < 1.0 {
                 return v;
             }
         }
     }
 
-    pub fn in_pixel<F: Float>(&mut self, pixel: Pixel<F>) -> Vector2<F> {
-        Vector2 {
-            x: (pixel.coord.x + self.range01::<F>()) / (pixel.frame_size.x - F::ONE),
-            y: F::ONE - (pixel.coord.y + self.range01::<F>()) / (pixel.frame_size.y - F::ONE),
+    pub fn in_pixel(&mut self, pixel: Pixel) -> Vec2 {
+        Vec2 {
+            x: (pixel.coord.x + self.range01()) / (pixel.frame_size.x - 1.0),
+            y: 1.0 - (pixel.coord.y + self.range01()) / (pixel.frame_size.y - 1.0),
         }
     }
 }

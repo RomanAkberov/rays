@@ -1,21 +1,21 @@
 use serde::Deserialize;
 use crate::{
     background::Background,
-    math::Vector3,
+    math::{Float, Vec3},
     object::Object,
 };
 
 #[derive(Deserialize)]
-pub struct SceneDef<F> {
-    pub camera: CameraDef<F>,
-    pub background: Background<F>,
-    pub objects: Vec<Object<F>>,
+pub struct SceneDef {
+    pub camera: CameraDef,
+    pub background: Background,
+    pub objects: Vec<Object>,
 }
 
 #[derive(Deserialize)]
-pub struct CameraDef<F> {
-    pub eye: Vector3<F>,
-    pub target: Vector3<F>,
-    pub fov: F,
-    pub aperture: F,
+pub struct CameraDef {
+    pub eye: Vec3,
+    pub target: Vec3,
+    pub fov: Float,
+    pub aperture: Float,
 }

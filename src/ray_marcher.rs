@@ -6,8 +6,8 @@ use crate::{
     scene::Scene,
 };
 
-pub const MIN_T: f64 = 0.0001;
-pub const MAX_T: f64 = 100.0;
+pub const T_MIN: Float = 0.0001;
+pub const T_MAX: Float = 100.0;
 
 pub struct RayMarcher {
 
@@ -20,9 +20,7 @@ impl RayMarcher {
 }
 
 impl PixelRenderer for RayMarcher {
-    fn render_pixel<F: Float>(&self, scene: &Scene<F>, pixel: Pixel<F>, random: &mut Random) -> Color<F> {
-        let min_t = F::of(MIN_T);
-        let max_t = F::of(MAX_T);
+    fn render_pixel(&self, scene: &Scene, pixel: Pixel, random: &mut Random) -> Color {
         let uv = random.in_pixel(pixel);
         let mut ray = scene.camera.ray(uv, random);
         loop {
@@ -31,10 +29,10 @@ impl PixelRenderer for RayMarcher {
                 .map(|obj| (obj, obj.shape.distance(ray.origin)))
                 .min_by(|hit1, hit2| hit1.1.partial_cmp(&hit2.1).unwrap());
             if let Some((obj, t)) = hit {
-                if t >= max_t {
+                if t >= T_MIN {
                     return scene.background.color(&ray);
                 }
-                if t <= min_t {
+                if t <= T_MAX {
                     return obj.material.albedo;
                 }
                 ray.origin = ray.at(t);
