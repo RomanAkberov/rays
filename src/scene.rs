@@ -20,7 +20,8 @@ impl<F: Float> Scene<F> {
                 def.camera.target,
                 Vector3::new(F::ZERO, F::ONE, F::ZERO),
                 def.camera.fov, 
-                aspect
+                aspect,
+                def.camera.aperture,
             ),
             background: def.background,
             objects: def.objects,

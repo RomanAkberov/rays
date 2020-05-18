@@ -98,6 +98,24 @@ impl<F> Vector2<F> {
     }
 }
 
+impl<F: Float> Vector2<F> {
+    pub fn length(self) -> F {
+        (self.x * self.x + self.y * self.y).sqrt()
+    }
+
+    pub fn length_squared(self) -> F {
+        self.x * self.x + self.y * self.y
+    }
+}
+
+impl<F: Float> ops::Mul<F> for Vector2<F> {
+    type Output = Self;
+
+    fn mul(self, other: F) -> Self::Output {
+        Self::new(self.x * other, self.y * other)
+    }
+}
+
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 #[derive(Deserialize)]
 pub struct Vector3<F> {

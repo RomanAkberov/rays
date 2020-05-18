@@ -17,4 +17,5 @@ pub struct CameraDef<F> {
     pub eye: Vector3<F>,
     pub target: Vector3<F>,
     pub fov: F,
+    pub aperture: F,
 }

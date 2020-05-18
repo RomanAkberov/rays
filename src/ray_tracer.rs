@@ -38,7 +38,7 @@ impl RayTracer {
 
 impl PixelRenderer for RayTracer {
     fn render_pixel<F: Float>(&self, scene: &Scene<F>, pixel: Pixel<F>, random: &mut Random) -> Color<F> {
-        let ray = scene.camera.ray(random.in_pixel(pixel));
+        let ray = scene.camera.ray(random.in_pixel(pixel), random);
         self.cast_ray(&ray, scene, self.max_depth, random)
     }
 }

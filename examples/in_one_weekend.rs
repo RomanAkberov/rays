@@ -1,15 +1,15 @@
 fn main() -> rays::RayResult<()> {
     let config = rays::Config {
         image: rays::ImageConfig {
-            path: "ray-marcher.png".to_string(),
+            path: "ray-tracer.png".to_string(),
             width: 1920,
             height: 1080,
             gamma_correction: true,
         },
         precision: rays::Precision::F64,
         max_depth: 50,
-        samples: 10,
-        renderer: rays::RenderMode::RayMarcher,
+        samples: 1024,
+        renderer: rays::RenderMode::RayTracer,
         show_progress: true,
     };
     rays::run_loader(&config, Loader)
@@ -111,7 +111,8 @@ impl rays::SceneLoader for Loader {
             camera: rays::CameraDef {
                 eye: rays::Vector3::new(F::of(13.0), F::of(2.0), F::of(3.0)),
                 target: rays::Vector3::ZERO,
-                fov: F::of(20.0)
+                fov: F::of(20.0),
+                aperture: F::of(0.2),
             },
             background: rays::Background {
                 top: rays::Color::new(F::of(0.5), F::of(0.7), F::of(1.0)),

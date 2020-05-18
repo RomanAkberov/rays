@@ -26,6 +26,10 @@ impl Random {
         F::of(self.next_state() as f64 / 4294967296.0)
     }
 
+    pub fn in_range<F: Float>(&mut self, min: F, max: F) -> F {
+        min + (max - min) * self.range01()
+    }
+
     pub fn probability<F: Float>(&mut self, probability: F) -> bool {
         self.range01::<F>() < probability
     }
@@ -33,9 +37,9 @@ impl Random {
     pub fn in_sphere<F: Float>(&mut self) -> Vector3<F> {
         loop {
             let v = Vector3::new(
-                self.range01::<F>() * F::TWO - F::ONE, 
-                self.range01::<F>() * F::TWO - F::ONE,
-                self.range01::<F>() * F::TWO - F::ONE,
+                self.in_range::<F>(-F::ONE, F::ONE), 
+                self.in_range::<F>(-F::ONE, F::ONE),
+                self.in_range::<F>(-F::ONE, F::ONE),
             );
             if v.length_squared() < F::ONE {
                 return v;
@@ -49,6 +53,18 @@ impl Random {
             in_sphere
         } else {
             -in_sphere
+        }
+    }
+
+    pub fn in_disk<F: Float>(&mut self) -> Vector2<F> {
+        loop {
+            let v = Vector2::new(
+                self.in_range::<F>(-F::ONE, F::ONE),
+                self.in_range::<F>(-F::ONE, F::ONE),
+            );
+            if v.length_squared() < F::ONE {
+                return v;
+            }
         }
     }
 

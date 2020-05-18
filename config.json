@@ -1,12 +1,13 @@
 {
     "image": {
-        "path": "ray-tracer.png",
-        "width": 64,
-        "height": 64,
+        "path": "ray-marcher.png",
+        "width": 800,
+        "height": 600,
         "gamma_correction": true
     },
-    "samples": 4,
+    "samples": 1024,
     "max_depth": 10,
     "precision": "F64",
-    "renderer": "RayTracer"
+    "renderer": "RayMarcher",
+    "show_progress": true
 }

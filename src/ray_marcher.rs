@@ -24,7 +24,7 @@ impl PixelRenderer for RayMarcher {
         let min_t = F::of(MIN_T);
         let max_t = F::of(MAX_T);
         let uv = random.in_pixel(pixel);
-        let mut ray = scene.camera.ray(uv);
+        let mut ray = scene.camera.ray(uv, random);
         loop {
             let hit = scene.objects
                 .iter()
