@@ -28,8 +28,9 @@ impl Shape for Sphere {
             if t <= T_MIN {
                 None
             } else {
-                let normal = (ray.at(t) - self.center).normalized();
-                Some(Hit { t, normal })
+                let point = ray.at(t);
+                let normal = (point - self.center).normalized();
+                Some(Hit { t, point, normal })
             }
         }
     }

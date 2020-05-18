@@ -3,6 +3,7 @@ use crate::{
     math::{Float, Ray, Vec3},
     random::Random,
     shapes::Hit,
+    texture::Texture,
 };
 
 pub trait Material: Sync {
@@ -11,21 +12,21 @@ pub trait Material: Sync {
 }
 
 pub struct Diffuse {
-    pub color: Color,
+    pub texture: Box<dyn Texture>,
 }
 
 impl Material for Diffuse {
     fn color(&self) -> Color {
-        self.color
+        Color::WHITE
     }
 
-    fn scatter(&self, ray: &Ray, hit: &Hit, random: &mut Random) -> Option<(Color, Ray)> {
+    fn scatter(&self, _: &Ray, hit: &Hit, random: &mut Random) -> Option<(Color, Ray)> {
         let direction = random.in_hemisphere(hit.normal); // hit.normal + random.in_sphere();
         let ray = Ray {
-            origin: ray.at(hit.t),
+            origin: hit.point,
             direction: direction.normalized(),
         };
-        Some((self.color, ray))
+        Some((self.texture.value(hit), ray))
     }
 }
 
@@ -47,7 +48,7 @@ impl Material for Metallic {
             reflected
         };
         let ray = Ray {
-            origin: ray.at(hit.t),
+            origin: hit.point,
             direction: direction.normalized(),
         };
         Some((self.color, ray))
@@ -78,7 +79,7 @@ impl Material for Dielectric {
             refract(ray.direction, normal, eta)
         };
         let ray = Ray {
-            origin: ray.at(hit.t),
+            origin: hit.point,
             direction: direction.normalized(),
         };
         Some((Color::WHITE, ray))

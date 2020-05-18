@@ -6,6 +6,7 @@ pub use sphere::Sphere;
 
 pub struct Hit {
     pub t: Float,
+    pub point: Vec3,
     pub normal: Vec3,
 }
 
@@ -15,7 +16,7 @@ pub trait Shape: Sync {
 }
 
 impl Shape for Aabb3 {
-    fn hit(&self, ray: &Ray) -> Option<Hit> {
+    fn hit(&self, _: &Ray) -> Option<Hit> {
         // let tmin = (self.min - ray.origin) / ray.direction;
         // let tmax = (self.max - ray.origin) / ray.direction;
         // let rmin = tmin.min(tmax); 

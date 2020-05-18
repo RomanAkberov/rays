@@ -19,7 +19,7 @@ fn main() -> RayResult<()> {
 fn scene() -> SceneDef {
     let mut objects = Vec::new();
     let ground_material = Box::new(Diffuse {
-        color: Color::new(0.5, 0.5, 0.5),
+        texture: Box::new(Checker(Color::new(0.2, 0.3, 0.1), Color::new(0.9, 0.9, 0.9))),
     });
     objects.push(Object {
         shape: Box::new(Sphere {
@@ -42,11 +42,11 @@ fn scene() -> SceneDef {
                 let material: Box<dyn Material> = if choose_mat < 0.8 {
                     // diffuse
                     Box::new(Diffuse {
-                        color: Color {
-                            r: random.in_01() * random.in_01(),
-                            g: random.in_01() * random.in_01(),
-                            b: random.in_01() * random.in_01(),
-                        },
+                        texture: Box::new(Color::new(
+                            random.in_01() * random.in_01(),
+                            random.in_01() * random.in_01(),
+                            random.in_01() * random.in_01(),
+                        )),
                     })
                 } else if choose_mat < 0.95 {
                     // metal
@@ -96,7 +96,7 @@ fn scene() -> SceneDef {
             radius: 1.0,
         }),
         material: Box::new(Diffuse {
-            color: Color::new(0.4, 0.2, 0.1),
+            texture: Box::new(Color::new(0.4, 0.2, 0.1)),
         }),
     });
     objects.push(Object {
