@@ -26,6 +26,10 @@ impl Random {
         F::of(self.next_state() as f64 / 4294967296.0)
     }
 
+    pub fn probability<F: Float>(&mut self, probability: F) -> bool {
+        self.range01::<F>() < probability
+    }
+
     pub fn in_sphere<F: Float>(&mut self) -> Vector3<F> {
         loop {
             let v = Vector3::new(

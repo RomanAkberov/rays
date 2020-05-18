@@ -3,6 +3,7 @@ use crate::{
     config::ImageConfig,
     math::{Float, Vector2},
     image::Image,
+    progress::Progress,
     random::Random,
     scene::Scene,
 };
@@ -50,7 +51,7 @@ impl<P: PixelRenderer> Renderer<P> {
 }
 
 impl<P: PixelRenderer> Renderer<P> {
-    pub fn render<F: Float>(&mut self, scene: &Scene<F>, config: &ImageConfig) -> Image<F> {
+    pub fn render<F: Float>(&mut self, scene: &Scene<F>, config: &ImageConfig, progress: &dyn Progress) -> Image<F> {
         use rayon::prelude::*;
 
         let width = config.width;
@@ -75,6 +76,7 @@ impl<P: PixelRenderer> Renderer<P> {
                     }
                     colors.push(color);
                 }
+                progress.increment(height);
                 colors
             })
             .collect();

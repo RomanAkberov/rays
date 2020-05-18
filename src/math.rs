@@ -20,6 +20,8 @@ pub trait Float : Copy + Clone + Default + Debug +
     fn of(value: f64) -> Self;
     fn to(self) -> f64;
     fn sqrt(self) -> Self;
+    fn powi(self, pow: i32) -> Self;
+    fn min(self, other: Self) -> Self;
 }
 
 impl Float for f64 {
@@ -37,7 +39,19 @@ impl Float for f64 {
     }
 
     fn sqrt(self) -> Self {
-        f64::sqrt(self)
+        Self::sqrt(self)
+    }
+
+    fn powi(self, pow: i32) -> Self {
+        Self::powi(self, pow)
+    }
+
+    fn min(self, other: Self) -> Self {
+        if self < other {
+            self
+        } else {
+            other
+        }
     }
 }
 
@@ -56,7 +70,19 @@ impl Float for f32 {
     }
 
     fn sqrt(self) -> Self {
-        f32::sqrt(self)
+        Self::sqrt(self)
+    }
+    
+    fn powi(self, pow: i32) -> Self {
+        Self::powi(self, pow)
+    }
+
+    fn min(self, other: Self) -> Self {
+        if self < other {
+            self
+        } else {
+            other
+        }
     }
 }
 

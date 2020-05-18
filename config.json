@@ -1,10 +1,12 @@
 {
     "image": {
-        "width": 1920,
-        "height": 1080,
+        "path": "ray-tracer.png",
+        "width": 64,
+        "height": 64,
         "gamma_correction": true
     },
-    "samples": 100,
-    "max_depth": 50,
-    "precision": "F64"
+    "samples": 4,
+    "max_depth": 10,
+    "precision": "F64",
+    "renderer": "RayTracer"
 }

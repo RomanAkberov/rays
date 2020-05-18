@@ -18,6 +18,7 @@ impl<F> Color<F> {
 
 impl<F: Float> Color<F> {
     pub const BLACK: Self = Self::new(F::ZERO, F::ZERO, F::ZERO);
+    pub const WHITE: Self = Self::new(F::ONE, F::ONE, F::ONE);
     
     pub fn lerp(&self, other: &Self, t: F) -> Self {
         Self {
