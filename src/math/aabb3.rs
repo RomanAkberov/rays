@@ -1,4 +1,4 @@
-use super::Vec3;
+use super::{Float, Hit, Ray, Vec3};
 
 pub struct Aabb3 {
     pub min: Vec3,
@@ -12,5 +12,15 @@ impl Aabb3 {
 
     pub fn diagonal(&self) -> Vec3 {
         self.max - self.min
+    }
+
+    pub fn sdf(&self, point: Vec3) -> Float {
+        let p = point - self.center();
+        let q = p.abs() - self.diagonal() * 0.5;
+        q.max(Vec3::ZERO).len() + q.maxcomp().min(0.0)
+    }
+
+    pub fn hit(&self, _: &Ray) -> Option<Hit> {
+        None
     }
 }

@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use crate::math::{Float, Ray, Vec3};
-use super::{Shape, Hit};
+use super::Hit;
 
 const T_MIN: Float = 0.001;
 
@@ -10,8 +10,8 @@ pub struct Sphere {
     pub radius: Float,
 }
 
-impl Shape for Sphere {
-    fn hit(&self, ray: &Ray) -> Option<Hit> {
+impl Sphere {
+    pub fn hit(&self, ray: &Ray) -> Option<Hit> {
         let oc = ray.origin - self.center;
         let a = ray.direction.dot(ray.direction);
         let b = ray.direction.dot(oc);
@@ -35,7 +35,7 @@ impl Shape for Sphere {
         }
     }
 
-    fn sdf(&self, point: Vec3) -> Float {
+    pub fn sdf(&self, point: Vec3) -> Float {
         self.center.distance(point) - self.radius
     }
 }

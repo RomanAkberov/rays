@@ -1,9 +1,9 @@
 use crate::{
-    shapes::Shape,
     material::Material,
+    math::Shape,
 };
 
 pub struct Object {
-    pub shape: Box<dyn Shape>,
-    pub material: Box<dyn Material>,
+    pub shape: Shape,
+    pub material: Material,
 }

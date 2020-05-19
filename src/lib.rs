@@ -13,7 +13,6 @@ mod ray_marcher;
 mod ray_tracer;
 mod renderer;
 mod scene;
-mod shapes;
 mod texture;
 
 use serde::Deserialize;
@@ -37,7 +36,6 @@ pub use material::*;
 pub use math::*;
 pub use object::Object;
 pub use random::Random;
-pub use shapes::*;
 pub use texture::*;
 
 pub type RayResult<T> = Result<T, Box<dyn std::error::Error>>;

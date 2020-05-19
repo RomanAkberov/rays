@@ -10,7 +10,7 @@ fn main() -> RayResult<()> {
         },
         max_depth: 50,
         samples: 10,
-        renderer: RenderMode::RayTracer,
+        renderer: RenderMode::RayMarcher,
         show_progress: true,
     };
     run_scene(&config, scene())
@@ -18,11 +18,14 @@ fn main() -> RayResult<()> {
 
 fn scene() -> SceneDef {
     let mut objects = Vec::new();
-    let ground_material = Box::new(Diffuse {
-        texture: Box::new(Checker(Color::new(0.2, 0.3, 0.1), Color::new(0.9, 0.9, 0.9))),
-    });
+    let ground_material = Material::Diffuse(
+        Texture::Checker(
+            Box::new(Texture::Constant(Color::new(0.2, 0.3, 0.1))), 
+            Box::new(Texture::Constant(Color::new(0.9, 0.9, 0.9))),
+        ),
+    );
     objects.push(Object {
-        shape: Box::new(Sphere {
+        shape: Shape::Sphere(Sphere {
             center: Vec3([0.0, -1000.0, 0.0]),
             radius: 1000.0,
         }),
@@ -39,37 +42,32 @@ fn scene() -> SceneDef {
                 b as Float + 0.9 * random.in_01(),
             ]);
             if center.distance(Vec3([4.0, 0.2, 0.0])) > 0.9 {
-                let material: Box<dyn Material> = if choose_mat < 0.8 {
+                let material = if choose_mat < 0.8 {
                     // diffuse
-                    Box::new(Diffuse {
-                        texture: Box::new(Color::new(
+                    Material::Diffuse(
+                        Texture::Constant(Color::new(
                             random.in_01() * random.in_01(),
                             random.in_01() * random.in_01(),
                             random.in_01() * random.in_01(),
-                        )),
-                    })
+                        ))
+                    )
                 } else if choose_mat < 0.95 {
                     // metal
-                    Box::new(Metallic {
-                        fuzziness: random.in_range(0.0, 0.5),
-                        color: Color {
-                            r: random.in_range(0.5, 1.0),
-                            g: random.in_range(0.5, 1.0),
-                            b: random.in_range(0.5, 1.0),
-                        },
-                    })
+                    Material::Metallic(Color::new(
+                        random.in_range(0.5, 1.0),
+                        random.in_range(0.5, 1.0),
+                        random.in_range(0.5, 1.0),
+                    ), random.in_range(0.0, 0.5))
                 } else {
-                    Box::new(Dielectric {
-                        index: 1.5,
-                    })
+                    Material::Dielectric(1.5)
                 };
                 let shape = if choose_sphere {
-                    Box::new(Sphere {
+                    Shape::Sphere(Sphere {
                         center,
                         radius: 0.2,
-                    }) as Box<dyn Shape>
+                    })
                 } else {
-                    Box::new(Aabb3 {
+                    Shape::Cuboid(Aabb3 {
                         min: center - Vec3::splat(0.2),
                         max: center + Vec3::splat(0.2),
                     })
@@ -82,32 +80,30 @@ fn scene() -> SceneDef {
         }
     }
     objects.push(Object {
-        shape: Box::new(Sphere {
+        shape: Shape::Sphere(Sphere {
             center: Vec3([0.0, 1.0, 0.0]),
             radius: 1.0,
         }),
-        material: Box::new(Dielectric {
-            index: 1.5,
-        })
+        material: Material::Dielectric(1.5),
     });
     objects.push(Object {
-        shape: Box::new(Sphere {
+        shape: Shape::Sphere(Sphere {
             center: Vec3([-4.0, 1.0, 0.0]),
             radius: 1.0,
         }),
-        material: Box::new(Diffuse {
-            texture: Box::new(Color::new(0.4, 0.2, 0.1)),
-        }),
+        material: Material::Diffuse(
+            Texture::Constant(Color::new(0.4, 0.2, 0.1)),
+        ),
     });
     objects.push(Object {
-        shape: Box::new(Sphere {
+        shape: Shape::Sphere(Sphere {
             center: Vec3([4.0, 1.0, 0.0]),
             radius: 1.0,
         }),
-        material: Box::new(Metallic {
-            fuzziness: 0.0,
-            color: Color::new(0.7, 0.6, 0.5),
-        }),
+        material: Material::Metallic(
+            Color::new(0.7, 0.6, 0.5),
+            0.0,
+        ),
     });
     SceneDef {
         camera: CameraDef {
