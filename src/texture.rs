@@ -15,14 +15,14 @@ impl Texture {
             &Self::Constant(color) => color,
             Self::Normal => {
                 Color::new(
-                    hit.normal[0] * 0.5 + 1.0,
-                    hit.normal[1] * 0.5 + 1.0,
-                    hit.normal[2] * 0.5 + 1.0,
+                    hit.normal.x * 0.5 + 1.0,
+                    hit.normal.y * 0.5 + 1.0,
+                    hit.normal.z * 0.5 + 1.0,
                 )
             }
             Self::Checker(even, odd) => {
                 let p = hit.point * 10.0;
-                let sines = p[0].sin() * p[1].sin() * p[2].sin();
+                let sines = p.x.sin() * p.y.sin() * p.z.sin();
                 if sines < 0.0 {
                     even.color(hit)
                 } else {

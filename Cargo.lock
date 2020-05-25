@@ -225,6 +225,7 @@ dependencies = [
  "rayon",
  "serde",
  "serde_json",
+ "smth",
 ]
 
 [[package]]
@@ -267,6 +268,14 @@ checksum = "993948e75b189211a9b31a7528f950c6adc21f9720b6438ff80a7fa2f864cea2"
 dependencies = [
  "itoa",
  "ryu",
+ "serde",
+]
+
+[[package]]
+name = "smth"
+version = "0.1.0"
+source = "git+https://github.com/RomanAkberov/smth.git#6957073030731c895bda9d8d9e5d0bef8def94fb"
+dependencies = [
  "serde",
 ]
 

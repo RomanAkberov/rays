@@ -1,13 +1,14 @@
+use smth::Vec3D;
 use crate::{
-    math::{Float, Ray, Vec2, Vec3},
+    math::{Float, Ray, Vec2},
     random::Random,
 };
 
 pub struct Camera {
-    eye: Vec3, 
-    right: Vec3,
-    up: Vec3,
-    forward: Vec3,
+    eye: Vec3D, 
+    right: Vec3D,
+    up: Vec3D,
+    forward: Vec3D,
     viewport: Vec2,
     lens_radius: Float,
     focus: Float,
@@ -15,9 +16,9 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(
-        eye: Vec3, 
-        target: Vec3, 
-        up: Vec3, 
+        eye: Vec3D, 
+        target: Vec3D, 
+        up: Vec3D, 
         fov: Float, 
         aspect: Float,
         aperture: Float,
@@ -29,7 +30,7 @@ impl Camera {
         let right = forward.cross(up).normalized();
         let up = right.cross(forward);
         let lens_radius = 0.5 * aperture;
-        let focus = (target - eye).len();
+        let focus = target.distance(eye);
         Self {
             eye,
             right,

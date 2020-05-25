@@ -1,6 +1,7 @@
+use smth::Vec3D;
 use crate::{
     color::Color,
-    math::{Float, Hit, Ray, Vec3},
+    math::{Float, Hit, Ray},
     random::Random,
     texture::Texture,
 };
@@ -27,7 +28,7 @@ impl Material {
                 (texture.color(hit), direction)
             }
             &Self::Metallic(color, fuzziness) => {
-                let reflected = reflect(ray.direction.normalized(), hit.normal);
+                let reflected = reflect(ray.direction, hit.normal);
                 let direction = if fuzziness > 0.0 {
                     reflected + random.in_sphere() * fuzziness
                 } else {
@@ -66,13 +67,13 @@ fn schlick(cosine: Float, eta: Float) -> Float {
     return r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
 }
 
-fn reflect(vector: Vec3, normal: Vec3) -> Vec3 {
+fn reflect(vector: Vec3D, normal: Vec3D) -> Vec3D {
     vector - normal * 2.0 * vector.dot(normal)
 }
 
-fn refract(vector: Vec3, normal: Vec3, eta: Float) -> Vec3 {
+fn refract(vector: Vec3D, normal: Vec3D, eta: Float) -> Vec3D {
     let cos_theta = normal.dot(-vector);
     let parallel = (vector + normal * cos_theta) * eta;
-    let perp = normal * -(1.0 - parallel.len2()).sqrt();
+    let perp = normal * -(1.0 - parallel.length2()).sqrt();
     parallel + perp
 }

@@ -1,4 +1,5 @@
-use crate::math::{Float, Vec2, Vec3};
+use smth::Vec3D;
+use crate::math::{Float, Vec2};
 use crate::renderer::Pixel;
 
 pub struct Random {
@@ -34,20 +35,20 @@ impl Random {
         self.in_01() < probability
     }
 
-    pub fn in_sphere(&mut self) -> Vec3 {
+    pub fn in_sphere(&mut self) -> Vec3D {
         loop {
-            let v = Vec3([
+            let v = Vec3D::new(
                 self.in_range(-1.0, 1.0), 
                 self.in_range(-1.0, 1.0),
                 self.in_range(-1.0, 1.0),
-            ]);
-            if v.len2() < 1.0 {
+            );
+            if v.length2() < 1.0 {
                 return v;
             }
         }
     }
 
-    pub fn in_hemisphere(&mut self, normal: Vec3) -> Vec3 {
+    pub fn in_hemisphere(&mut self, normal: Vec3D) -> Vec3D {
         let in_sphere = self.in_sphere();
         if in_sphere.dot(normal) > 0.0 {
             in_sphere

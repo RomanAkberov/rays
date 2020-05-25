@@ -1,6 +1,7 @@
+use smth::Vec3D;
 use crate::{
     background::Background,
-    math::{Float, Vec3},
+    math::Float,
     object::Object,
 };
 
@@ -11,8 +12,8 @@ pub struct SceneDef {
 }
 
 pub struct CameraDef {
-    pub eye: Vec3,
-    pub target: Vec3,
+    pub eye: Vec3D,
+    pub target: Vec3D,
     pub fov: Float,
     pub aperture: Float,
 }

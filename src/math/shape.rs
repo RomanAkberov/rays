@@ -1,8 +1,9 @@
-use super::{Aabb3, Float, Hit, Ray, Sphere, Vec3};
+use smth::Vec3D;
+use super::{Bounds3D, Float, Hit, Ray, Sphere};
 
 pub enum Shape {
     Sphere(Sphere),
-    Cuboid(Aabb3),
+    Cuboid(Bounds3D),
 }
 
 impl Shape {
@@ -13,10 +14,17 @@ impl Shape {
         }
     }
 
-    pub fn sdf(&self, point: Vec3) -> Float {
+    pub fn sdf(&self, point: Vec3D) -> Float {
         match self {
             Self::Sphere(sphere) => sphere.sdf(point),
             Self::Cuboid(aabb) => aabb.sdf(point),
+        }
+    }
+
+    pub fn bounds(&self) -> Bounds3D {
+        match self {
+            Self::Sphere(sphere) => sphere.bounds(),
+            Self::Cuboid(aabb) => *aabb,
         }
     }
 }

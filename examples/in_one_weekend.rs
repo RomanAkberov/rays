@@ -1,4 +1,5 @@
 use rays::*;
+use smth::Vec3D;
 
 fn main() -> RayResult<()> {
     let config = Config {
@@ -26,7 +27,7 @@ fn scene() -> SceneDef {
     );
     objects.push(Object {
         shape: Shape::Sphere(Sphere {
-            center: Vec3([0.0, -1000.0, 0.0]),
+            center: Vec3D::new(0.0, -1000.0, 0.0),
             radius: 1000.0,
         }),
         material: ground_material,
@@ -36,12 +37,12 @@ fn scene() -> SceneDef {
         for b in -11 .. 11 {
             let choose_sphere = random.probability(0.5);
             let choose_mat = random.in_01();
-            let center = Vec3([
-                a as Float + 0.9 * random.in_01(), 
-                0.2,
-                b as Float + 0.9 * random.in_01(),
-            ]);
-            if center.distance(Vec3([4.0, 0.2, 0.0])) > 0.9 {
+            let center = Vec3D {
+                x: a as Float + 0.9 * random.in_01(), 
+                y: 0.2,
+                z: b as Float + 0.9 * random.in_01(),
+            };
+            if center.distance(Vec3D::new(4.0, 0.2, 0.0)) > 0.9 {
                 let material = if choose_mat < 0.8 {
                     // diffuse
                     Material::Diffuse(
@@ -67,9 +68,9 @@ fn scene() -> SceneDef {
                         radius: 0.2,
                     })
                 } else {
-                    Shape::Cuboid(Aabb3 {
-                        min: center - Vec3::splat(0.2),
-                        max: center + Vec3::splat(0.2),
+                    Shape::Cuboid(Bounds3 {
+                        min: center - Vec3D::of(0.2),
+                        max: center + Vec3D::of(0.2),
                     })
                 };
                 objects.push(Object {
@@ -81,14 +82,14 @@ fn scene() -> SceneDef {
     }
     objects.push(Object {
         shape: Shape::Sphere(Sphere {
-            center: Vec3([0.0, 1.0, 0.0]),
+            center: Vec3D::new(0.0, 1.0, 0.0),
             radius: 1.0,
         }),
         material: Material::Dielectric(1.5),
     });
     objects.push(Object {
         shape: Shape::Sphere(Sphere {
-            center: Vec3([-4.0, 1.0, 0.0]),
+            center: Vec3D::new(-4.0, 1.0, 0.0),
             radius: 1.0,
         }),
         material: Material::Diffuse(
@@ -97,7 +98,7 @@ fn scene() -> SceneDef {
     });
     objects.push(Object {
         shape: Shape::Sphere(Sphere {
-            center: Vec3([4.0, 1.0, 0.0]),
+            center: Vec3D::new(4.0, 1.0, 0.0),
             radius: 1.0,
         }),
         material: Material::Metallic(
@@ -107,8 +108,8 @@ fn scene() -> SceneDef {
     });
     SceneDef {
         camera: CameraDef {
-            eye: Vec3([13.0, 2.0, 3.0]),
-            target: Vec3::ZERO,
+            eye: Vec3D::new(13.0, 2.0, 3.0),
+            target: Vec3D::ZERO,
             fov: 20.0,
             aperture: 0.0,
         },
