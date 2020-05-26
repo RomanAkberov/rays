@@ -1,19 +1,19 @@
-use smth::Vec3D;
+use smth::{Float, Vec3};
 use crate::{
     color::Color,
-    math::{Float, Hit, Ray},
+    math::{Hit, Ray},
     random::Random,
     texture::Texture,
 };
 
-pub enum Material {
-    Diffuse(Texture),
-    Metallic(Color, Float),
-    Dielectric(Float),
+pub enum Material<S> {
+    Diffuse(Texture<S>),
+    Metallic(Color<S>, S),
+    Dielectric(S),
 }
 
-impl Material {
-    pub fn color(&self) -> Color {
+impl<S: Float> Material<S> {
+    pub fn color(&self) -> Color<S> {
         match self {
             Self::Diffuse(_) => Color::WHITE,
             &Self::Metallic(color, _) => color,
@@ -21,15 +21,15 @@ impl Material {
         }
     }
 
-    pub fn scatter(&self, ray: &Ray, hit: &Hit, random: &mut Random) -> Option<(Color, Ray)> {
+    pub fn scatter(&self, ray: &Ray<S>, hit: &Hit<S>, random: &mut Random) -> Option<(Color<S>, Ray<S>)> {
         let (color, direction) = match self {
             Self::Diffuse(texture) => {
                 let direction = random.in_hemisphere(hit.normal); // hit.normal + random.in_sphere();
                 (texture.color(hit), direction)
             }
             &Self::Metallic(color, fuzziness) => {
-                let reflected = reflect(ray.direction, hit.normal);
-                let direction = if fuzziness > 0.0 {
+                let reflected = ray.direction.reflect(hit.normal);
+                let direction = if fuzziness > S::ZERO {
                     reflected + random.in_sphere() * fuzziness
                 } else {
                     reflected
@@ -37,16 +37,19 @@ impl Material {
                 (color, direction)
             }
             &Self::Dielectric(index) => {
-                let (normal, eta) = if ray.direction.dot(hit.normal) < 0.0 {
-                    (hit.normal, 1.0 / index)
+                let (normal, eta) = if ray.direction.dot(hit.normal) < S::ZERO {
+                    (hit.normal, S::ONE / index)
                 } else {
                     (-hit.normal, index)
                 };
                 // TODO do not compute cos_theta twice (here and in refract)?
-                let cos_theta = ray.direction.dot(-normal).min(1.0);
-                let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
-                let direction = if eta * sin_theta > 1.0 || random.probability(schlick(cos_theta, eta)) {
-                    reflect(ray.direction, normal)
+                let mut cos_theta = ray.direction.dot(-normal);
+                if cos_theta > S::ONE {
+                    cos_theta = S::ONE;
+                }
+                let sin_theta = (S::ONE - cos_theta * cos_theta).sqrt();
+                let direction = if eta * sin_theta > S::ONE || random.probability(schlick(cos_theta, eta)) {
+                    ray.direction.reflect(normal)
                 } else {
                     refract(ray.direction, normal, eta)
                 };
@@ -61,19 +64,15 @@ impl Material {
     }
 }
 
-fn schlick(cosine: Float, eta: Float) -> Float {
-    let mut r0 = (1.0 - eta) / (1.0 + eta);
+fn schlick<S: Float>(cosine: S, eta: S) -> S {
+    let mut r0 = (S::ONE - eta) / (S::ONE + eta);
     r0 *= r0;
-    return r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
+    return r0 + (S::ONE - r0) * (S::ONE - cosine).powi(5)
 }
 
-fn reflect(vector: Vec3D, normal: Vec3D) -> Vec3D {
-    vector - normal * 2.0 * vector.dot(normal)
-}
-
-fn refract(vector: Vec3D, normal: Vec3D, eta: Float) -> Vec3D {
+fn refract<S: Float>(vector: Vec3<S>, normal: Vec3<S>, eta: S) -> Vec3<S> {
     let cos_theta = normal.dot(-vector);
     let parallel = (vector + normal * cos_theta) * eta;
-    let perp = normal * -(1.0 - parallel.length2()).sqrt();
+    let perp = normal * -(S::ONE - parallel.len2()).sqrt();
     parallel + perp
 }

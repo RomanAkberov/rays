@@ -3,7 +3,7 @@ use crate::{
     math::Shape,
 };
 
-pub struct Object {
-    pub shape: Shape,
-    pub material: Material,
+pub struct Object<S> {
+    pub shape: Shape<S>,
+    pub material: Material<S>,
 }

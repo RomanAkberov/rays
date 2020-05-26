@@ -1,19 +1,18 @@
-use smth::Vec3D;
+use smth::Vec3;
 use crate::{
     background::Background,
-    math::Float,
     object::Object,
 };
 
-pub struct SceneDef {
-    pub camera: CameraDef,
-    pub background: Background,
-    pub objects: Vec<Object>,
+pub struct SceneDef<S> {
+    pub camera: CameraDef<S>,
+    pub background: Background<S>,
+    pub objects: Vec<Object<S>>,
 }
 
-pub struct CameraDef {
-    pub eye: Vec3D,
-    pub target: Vec3D,
-    pub fov: Float,
-    pub aperture: Float,
+pub struct CameraDef<S> {
+    pub eye: Vec3<S>,
+    pub target: Vec3<S>,
+    pub fov: S,
+    pub aperture: S,
 }

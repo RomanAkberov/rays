@@ -1,13 +1,10 @@
+use smth::Float;
 use crate::{
     color::Color,
-    math::Float,
     random::Random,
     renderer::{PixelRenderer, Pixel},
     scene::Scene,
 };
-
-pub const T_MIN: Float = 0.0001;
-pub const T_MAX: Float = 100.0;
 
 pub struct RayMarcher {
 
@@ -20,7 +17,9 @@ impl RayMarcher {
 }
 
 impl PixelRenderer for RayMarcher {
-    fn render_pixel(&self, scene: &Scene, pixel: Pixel, random: &mut Random) -> Color {
+    fn render_pixel<S: Float>(&self, scene: &Scene<S>, pixel: Pixel<S>, random: &mut Random) -> Color<S> {
+        let t_min = S::of(0.0001);
+        let t_max = S::of(100.0);
         let uv = random.in_pixel(pixel);
         let mut ray = scene.camera.ray(uv, random);
         loop {
@@ -29,10 +28,10 @@ impl PixelRenderer for RayMarcher {
                 .map(|obj| (&obj.material, obj.shape.sdf(ray.origin)))
                 .min_by(|hit1, hit2| hit1.1.partial_cmp(&hit2.1).unwrap());
             if let Some((material, t)) = hit {
-                if t > T_MAX {
+                if t > t_max {
                     return scene.background.color(&ray);
                 }
-                if t < T_MIN {
+                if t < t_min {
                     return material.color();
                 }
                 ray.origin = ray.at(t);

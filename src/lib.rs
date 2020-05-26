@@ -40,7 +40,7 @@ pub use texture::*;
 
 pub type RayResult<T> = Result<T, Box<dyn std::error::Error>>;
 
-fn save_png(image: &Image, path: &str) -> RayResult<()> {
+fn save_png(image: &Image<f64>, path: &str) -> RayResult<()> {
     let file = File::create(path)?;
     let ref mut writer = BufWriter::new(file);
     let mut encoder = png::Encoder::new(writer, image.width, image.height);
@@ -63,7 +63,7 @@ pub fn load_json<T: for <'d> Deserialize<'d>>(path: &str) -> RayResult<T> {
     Ok(value)
 }
 
-fn render<P: PixelRenderer>(pixel_renderer: P, scene: &Scene, config: &Config) -> RayResult<()> {
+fn render<P: PixelRenderer>(pixel_renderer: P, scene: &Scene<f64>, config: &Config) -> RayResult<()> {
     let mut renderer = Renderer::new(Multisampler::new(pixel_renderer, config.samples));
     let start = Instant::now();
     let progress = if config.show_progress {
@@ -78,8 +78,8 @@ fn render<P: PixelRenderer>(pixel_renderer: P, scene: &Scene, config: &Config) -
     save_png(&image, &config.image.path)
 }
 
-pub fn run_scene(config: &Config, scene: SceneDef) -> RayResult<()> {
-    let aspect = config.image.width as Float / config.image.height as Float;
+pub fn run_scene(config: &Config, scene: SceneDef<f64>) -> RayResult<()> {
+    let aspect = config.image.width as f64 / config.image.height as f64;
     let scene = Scene::load(scene, aspect);
     match config.renderer {
         RenderMode::RayTracer => render(RayTracer::new(config.max_depth), &scene, &config)?,

@@ -273,8 +273,9 @@ dependencies = [
 
 [[package]]
 name = "smth"
-version = "0.1.0"
-source = "git+https://github.com/RomanAkberov/smth.git#6957073030731c895bda9d8d9e5d0bef8def94fb"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c7456899f300fa34a372b361602b116cb0a42df315f7077bf6874a185ac0b3b1"
 dependencies = [
  "serde",
 ]

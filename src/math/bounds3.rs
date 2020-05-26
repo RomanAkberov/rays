@@ -1,44 +1,42 @@
-use smth::{Vec3, Vec3D};
-use super::{Float, Hit, Ray};
+use smth::{Float, Vec3};
+use super::{Hit, Ray};
 
 #[derive(Copy, Clone)]
-pub struct Bounds3<A> {
-    pub min: Vec3<A>,
-    pub max: Vec3<A>,
+pub struct Bounds3<S> {
+    pub min: Vec3<S>,
+    pub max: Vec3<S>,
 }
 
-pub type Bounds3D = Bounds3<f64>;
-
-impl Bounds3<f64> {
-    pub fn center(&self) -> Vec3D {
-        (self.min + self.max) * 0.5
+impl<S: Float> Bounds3<S> {
+    pub fn center(&self) -> Vec3<S> {
+        (self.min + self.max) * S::HALF
     }
 
-    pub fn diagonal(&self) -> Vec3D {
+    pub fn diagonal(&self) -> Vec3<S> {
         self.max - self.min
     }
 
-    pub fn sdf(&self, point: Vec3D) -> Float {
+    pub fn sdf(&self, point: Vec3<S>) -> S {
         let p = point - self.center();
-        let q = p.abs() - self.diagonal() * 0.5;
-        q.max(Vec3::ZERO).length() + q.max_component().min(0.0)
+        let q = p.abs() - self.diagonal() * S::HALF;
+        q.max(Vec3::ZERO).len() + q.max_component().min(S::ZERO)
     }
 
-    pub fn hit(&self, _: &Ray) -> Option<Hit> {
+    pub fn hit(&self, _: &Ray<S>) -> Option<Hit<S>> {
         None
     }
 
-    pub fn intersects(&self, ray: &Ray) -> bool {
-        let inverse = Vec3D::new(
-            1.0 / ray.direction.x,
-            1.0 / ray.direction.y,
-            1.0 / ray.direction.z,
-        ); // TODO precompute
+    pub fn intersects(&self, ray: &Ray<S>) -> bool {
+        let inverse = Vec3 {
+            x: S::ONE / ray.direction.x,
+            y: S::ONE / ray.direction.y,
+            z: S::ONE / ray.direction.z,
+        }; // TODO precompute
         let t1 = (self.min - ray.origin) * inverse;
         let t2 = (self.max - ray.origin) * inverse;
         let tmin = t1.min(t2).max_component();
         let tmax = t1.max(t2).min_component();
-        tmax > tmin.max(0.0)
+        tmax > tmin.max(S::ZERO)
     }
 
     pub fn union(&self, other: &Self) -> Self {

@@ -1,26 +1,26 @@
+use smth::{Float, Number};
 use std::ops::{Add, AddAssign, Mul};
 use serde::{Serialize, Deserialize};
-use crate::math::Float;
 
 #[derive(Copy, Clone, Debug, Default, PartialEq)]
 #[derive(Serialize, Deserialize)]
-pub struct Color {
-    pub r: Float,
-    pub g: Float,
-    pub b: Float,
+pub struct Color<S> {
+    pub r: S,
+    pub g: S,
+    pub b: S,
 }
 
-impl Color {    
-    pub const fn new(r: Float, g: Float, b: Float) -> Self {
+impl<S> Color<S> {    
+    pub const fn new(r: S, g: S, b: S) -> Self {
         Self { r, g, b }
     }
 }
 
-impl Color {
-    pub const BLACK: Self = Self::new(0.0, 0.0, 0.0);
-    pub const WHITE: Self = Self::new(1.0, 1.0, 1.0);
+impl<S: Float> Color<S> {
+    pub const BLACK: Self = Self::new(S::ZERO, S::ZERO, S::ZERO);
+    pub const WHITE: Self = Self::new(S::ONE, S::ONE, S::ONE);
     
-    pub fn lerp(&self, other: &Self, t: Float) -> Self {
+    pub fn lerp(&self, other: &Self, t: S) -> Self {
         Self {
             r: self.r + (other.r - self.r) * t,
             g: self.g + (other.g - self.g) * t,
@@ -29,14 +29,14 @@ impl Color {
     }
 }
 
-impl Into<[Float; 3]> for Color {
-    fn into(self) -> [Float; 3] {
+impl<S> Into<[S; 3]> for Color<S> {
+    fn into(self) -> [S; 3] {
         [self.r, self.g, self.b]
     }
 }
 
-impl From<[Float; 3]> for Color {
-    fn from(array: [Float; 3]) -> Self {
+impl<S: Copy> From<[S; 3]> for Color<S> {
+    fn from(array: [S; 3]) -> Self {
         Self {
             r: array[0],
             g: array[1],
@@ -45,7 +45,7 @@ impl From<[Float; 3]> for Color {
     }
 }
 
-impl Add for Color {
+impl<S: Number> Add for Color<S> {
     type Output = Self;
 
     fn add(self, other: Self) -> Self::Output {
@@ -57,7 +57,7 @@ impl Add for Color {
     }
 }
 
-impl AddAssign for Color {
+impl<S: Number> AddAssign for Color<S> {
     fn add_assign(&mut self, other: Self) {
         self.r += other.r;
         self.g += other.g;
@@ -65,10 +65,10 @@ impl AddAssign for Color {
     }
 }
 
-impl Mul<Float> for Color {
+impl<S: Number> Mul<S> for Color<S> {
     type Output = Self;
     
-    fn mul(self, other: Float) -> Self::Output {
+    fn mul(self, other: S) -> Self::Output {
         Self {
             r: self.r * other,
             g: self.g * other,
@@ -77,10 +77,10 @@ impl Mul<Float> for Color {
     }   
 }
 
-impl Mul for Color {
+impl<S: Number> Mul for Color<S> {
     type Output = Self;
     
-    fn mul(self, other: Color) -> Self::Output {
+    fn mul(self, other: Color<S>) -> Self::Output {
         Self {
             r: self.r * other.r,
             g: self.g * other.g,

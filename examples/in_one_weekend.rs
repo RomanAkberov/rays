@@ -4,25 +4,26 @@ use smth::Vec3D;
 fn main() -> RayResult<()> {
     let config = Config {
         image: ImageConfig {
-            path: "ray-marcher.png".to_string(),
+            path: "ray-tracer.png".to_string(),
             width: 640,
             height: 480,
             gamma_correction: true,
         },
         max_depth: 50,
-        samples: 10,
-        renderer: RenderMode::RayMarcher,
+        samples: 100,
+        renderer: RenderMode::RayTracer,
         show_progress: true,
     };
     run_scene(&config, scene())
 }
 
-fn scene() -> SceneDef {
+fn scene() -> SceneDef<f64> {
     let mut objects = Vec::new();
     let ground_material = Material::Diffuse(
         Texture::Checker(
             Box::new(Texture::Constant(Color::new(0.2, 0.3, 0.1))), 
             Box::new(Texture::Constant(Color::new(0.9, 0.9, 0.9))),
+            10.0,
         ),
     );
     objects.push(Object {
@@ -38,9 +39,9 @@ fn scene() -> SceneDef {
             let choose_sphere = random.probability(0.5);
             let choose_mat = random.in_01();
             let center = Vec3D {
-                x: a as Float + 0.9 * random.in_01(), 
+                x: a as f64 + 0.9 * random.in_01(), 
                 y: 0.2,
-                z: b as Float + 0.9 * random.in_01(),
+                z: b as f64 + 0.9 * random.in_01(),
             };
             if center.distance(Vec3D::new(4.0, 0.2, 0.0)) > 0.9 {
                 let material = if choose_mat < 0.8 {

@@ -1,8 +1,7 @@
-use smth::Vec3D;
-use super::Float;
+use smth::Vec3;
 
-pub struct Hit {
-    pub t: Float,
-    pub point: Vec3D,
-    pub normal: Vec3D,
+pub struct Hit<S> {
+    pub t: S,
+    pub point: Vec3<S>,
+    pub normal: Vec3<S>,
 }

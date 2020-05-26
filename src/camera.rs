@@ -1,35 +1,35 @@
-use smth::Vec3D;
+use smth::{Float, Vec2, Vec3};
 use crate::{
-    math::{Float, Ray, Vec2},
+    math::Ray,
     random::Random,
 };
 
-pub struct Camera {
-    eye: Vec3D, 
-    right: Vec3D,
-    up: Vec3D,
-    forward: Vec3D,
-    viewport: Vec2,
-    lens_radius: Float,
-    focus: Float,
+pub struct Camera<S> {
+    eye: Vec3<S>, 
+    right: Vec3<S>,
+    up: Vec3<S>,
+    forward: Vec3<S>,
+    viewport: Vec2<S>,
+    lens_radius: S,
+    focus: S,
 }
 
-impl Camera {
+impl<S: Float> Camera<S> {
     pub fn new(
-        eye: Vec3D, 
-        target: Vec3D, 
-        up: Vec3D, 
-        fov: Float, 
-        aspect: Float,
-        aperture: Float,
+        eye: Vec3<S>, 
+        target: Vec3<S>, 
+        up: Vec3<S>, 
+        fov: S, 
+        aspect: S,
+        aperture: S,
     ) -> Self {
         let theta = fov.to_radians();
-        let height = 2.0 * (0.5 * theta).tan();
-        let viewport = Vec2([height * aspect, height]);
+        let height = S::TWO * (S::HALF * theta).tan();
+        let viewport = Vec2::new(height * aspect, height);
         let forward = (target - eye).normalized();
         let right = forward.cross(up).normalized();
         let up = right.cross(forward);
-        let lens_radius = 0.5 * aperture;
+        let lens_radius = S::HALF * aperture;
         let focus = target.distance(eye);
         Self {
             eye,
@@ -42,16 +42,16 @@ impl Camera {
         }
     }
 
-    pub fn ray(&self, uv: Vec2, random: &mut Random) -> Ray {
+    pub fn ray(&self, uv: Vec2<S>, random: &mut Random) -> Ray<S> {
         let rd = random.in_disk() * self.lens_radius;
-        let offset = self.right * rd[0] + self.up * rd[1];
+        let offset = self.right * rd.x + self.up * rd.y;
         Ray {
             origin: self.eye + offset,
             direction: (
                 (
                     self.forward + 
-                    self.right * self.viewport[0] * (uv[0] - 0.5) + 
-                    self.up * self.viewport[1] * (uv[1] - 0.5)
+                    self.right * self.viewport.x * (uv.x - S::HALF) + 
+                    self.up * self.viewport.y * (uv.y - S::HALF)
                 ) * self.focus - offset
             ).normalized(),
         }
